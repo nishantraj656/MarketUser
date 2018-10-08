@@ -1,0 +1,68 @@
+UserID - for user UserID
+ShopID - for shop ShopID
+List    - For selected Product
+Token - For Token
+ShopList - for Shop List 
+ItemInCart - for item in cart
+PID - chose product id
+categoryID - chose categoryID
+subID - chose subID
+costID - for customer id
+
+6209734084
+ 
+for add to car list
+#productID:'+chooseValue+",ShopID:"+this.state.data.shop_id+",Quntity:"+1+',Unit:'+this.state.data.unit+",Price:"+this.state.data.price
+
+ select product_table.price as price ,product_table.unit as unit,product_table.p_list_id,product_table.product_table_id as productID,product_table.shop_id AS ShopID,product_list_table.p_name AS pName,shop_info_table.name  as sName from product_table INNER JOIN product_list_table on product_table.p_list_id = product_list_table.p_list_id INNER JOIN shop_info_table ON shop_info_table.user_id = product_table.shop_id where product_list_table.sub_category_id = 1 AND product_table.shop_id= 1
+
+ select min(product_table.price) as price ,GROUP_CONCAT(product_table.unit) as unit,product_table.p_list_id,GROUP_CONCAT(product_table.product_table_id) as productID,GROUP_CONCAT(product_table.shop_id) AS ShopID,GROUP_CONCAT(product_list_table.p_name) AS pName,GROUP_CONCAT(shop_info_table.name)  as sName from product_table INNER JOIN product_list_table on product_table.p_list_id = product_list_table.p_list_id INNER JOIN shop_info_table ON shop_info_table.user_id = product_table.shop_id INNER JOIN sub_category_table ON sub_category_table.subcategory_id = product_list_table.sub_category_id WHERE sub_category_table.category_id =2 GROUP BY p_list_id
+
+ <View style={{padding:5,shadowOpacity:5,shadowColor:"#050505",flex:1}}>
+
+ 
+            {/* <Button title="More Details" onPress={()=>{this._storeData(PID,sID)  }}/> */}      
+
+        <Modal
+                animationType="slide"
+                transparent={true}
+                visible={this.state.modalVisible}
+                onRequestClose={() => {
+                  Alert.alert('Modal has been closed.');
+                }}>
+                <View style={{marginTop:20,marginBottom:20,flex:1,flexDirection:'row'}}>
+                  
+                    <View style={{alignSelf:'center',backgroundColor:"#0a932c",height:200}}>
+                        <View style={{alignSelf:'center',backgroundColor:"#0a932c"}}>
+                        <Text style={{color:"#ffffff",fontSize:20,fontWeight:'900'}}>Enter Quantity : </Text>
+                        <TextInput keyboardType='number-pad' placeholder="Enter Quantity" selectionColor='#ffffff' style={{borderBottomRightRadius:300}}/>
+                        </View>
+                        <View style={{justifyContent:'space-around',flexDirection:'row',padding:10,paddingTop:10}}>
+                        <Button
+                            raised
+                            icon={{name: 'cached'}}
+                            title='Done' 
+                            buttonStyle={{backgroundColor:'#3e96a8',}}/>
+                           
+                            <Button
+                            raised
+                            icon={{name: 'cached'}}
+                            title='Cancel'
+                            buttonStyle={{backgroundColor:'#ef0000'}} 
+                            onPress={()=>{this.setState({modalVisible:false})}}/>
+
+                        </View>
+                       
+                          
+                          </View>
+
+                          
+                         
+
+                    
+      
+                   
+                
+                </View>
+              </Modal>
+      
