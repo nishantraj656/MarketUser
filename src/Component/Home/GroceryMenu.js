@@ -50,7 +50,7 @@ class CartScreen extends React.Component {
 }
 
 
-export const HomeMenu = createBottomTabNavigator(
+export const Grocery = createBottomTabNavigator(
     {
         Home:ModalNavigator,
         Shopping: ModalNavigatorShop,

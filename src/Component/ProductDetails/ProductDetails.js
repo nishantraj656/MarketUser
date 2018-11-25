@@ -27,12 +27,21 @@ export default class ProductDetails extends React.Component
             pID:0,
             sID:0,
             data:[],
+            selectedQunt:0,
+            selectedShop:'not Selected',
+            price:0,
+            offer:0,
+            topay:0
         }
         this.conn=new Connection();
     }
 
     componentWillMount(){
-        this._retriveData();
+      //  this._retriveData();
+    }
+
+    componentDidMount(){
+       // this._retriveData();
     }
 
     _retriveData=async()=>{
@@ -60,68 +69,124 @@ export default class ProductDetails extends React.Component
 
     render(){
         let pName,price,shopName,unit,sID,pID,Qun,desc,pListID;
-        if(this.state.data.length){
-         pName = this.state.data[0].p_name;
-         price =this.state.data[0].price;
-         desc = this.state.data[0].p_desc;
-         Qun = '1';
-         pListID ="2"
-         unit =this.state.data[0].unit;
-         sID=this.state.data[0].shop_id;
-         pID=this.state.data[0].product_table_id;
+        const { navigation } = this.state.obj;
+         const itemId = navigation.getParam('id', 'NO-ID');
+         const info = navigation.getParam('info', 'some default value');
+         const name = navigation.getParam('name', 'some default value');
+         const pic = navigation.getParam('pic', 'some default value');
+       // alert(pic);
+       
+
+         
        
      return(
-     <View style={{padding:5,shadowOpacity:5,shadowColor:"#050505",flex:1}}>
-    
+        
+     <View style={{flex:1,justifyContent:'space-between'}}>
+         <ScrollView>
          <View style={{ 
                                         backgroundColor:'#fffcfc', 
                                         padding:5,
-                                       
+                                        borderBottomWidth:0.5,
+                                        borderBottomColor:'#b4b5b3'
                                        
                                        
                                         }}>
-             <View style={{ height:200,flexDirection:'row'}}>
-             <View style={{paddingHorizontal:5,width: '100%', height: 200,}}>
-                 <Image style={{width: '100%', height: 200,flex:1}} source={{uri:'https://agriculturewire.com/wp-content/uploads/2015/07/rice-1024x768.jpg'}}/> 
-             </View>
-             <View style={{paddingHorizontal:5,width: '100%', height: 200,}}>
-                 <Image style={{width: '100%', height: 200,flex:1}} source={{uri:'https://agriculturewire.com/wp-content/uploads/2015/07/rice-1024x768.jpg'}}/> 
+             <View style={{ height:300,flexDirection:'row'}}>
+            
+             <View style={{paddingHorizontal:5,width: '100%', height:300,}}>
+                 <Image style={{width: '100%', height: 300,}} source={{uri:pic}}/> 
              </View>
              </View> 
              <View style={{alignItems:'center',justifyContent:'center',padding:3,margin:5,flexDirection:'row'}}>
-                 <Text style={{fontSize:20,fontWeight:'900'}}>{pName}</Text>
+                 <Text style={{fontSize:18}}>{name}</Text>
              </View>
 
-             <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-             <Text style={{fontSize:15,fontWeight:'900'}}>Price:{price} Rs/kg</Text>
-             
+             <View style={{alignItems:'center',justifyContent:'center',padding:3,margin:5,flexDirection:'row'}}>
+                 <Text style={{fontSize:12,fontWeight:'500',color:'#bbc0c9'}}>{info}</Text>
              </View>
-             
-            
-
-             <View>
-             <Text style={{fontSize:15,fontWeight:'500',color:"#720664"}}></Text>
-             </View>
-             <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-             <Text style={{fontSize:15,fontWeight:'900',paddingHorizontal:7,color:'#fcfcfc',backgroundColor:'#02490b'}}>*3.5</Text>
-             <Text style={{fontSize:15,fontWeight:'400',paddingHorizontal:7,color:'#878787',}}>Rating 1,657</Text>
-             </View>
+           
          </View>
-         <ScrollView>
-         <View >
-             <Text>{desc}</Text></View>
-         </ScrollView>
-        <View style={{flexDirection:'row',justifyContent:'space-around',backgroundColor:'#f7c927'}}>
-            <Button title="Add to cart" color="#f7c927" onPress={()=>{ProductListing(pID,sID,Qun,unit,price,pListID) }}/>
-            <Button title="Cancel" color="#f7c927" onPress={()=>{this.state.obj.goBack(); }}/>
+        
+         <View style={{ backgroundColor:'#fffcfc', 
+                                        padding:5,
+                                        borderBottomWidth:0.5,
+                                        borderBottomColor:'#b4b5b3'}}>
+                <View>          
+                    <Text style={{color:'#000cfc',alignSelf:'center',fontSize:15}}>Quntity : {this.state.selectedQunt} </Text>
+                </View>
+           <View style={{flexDirection:'row'}}>
+               
+ 
+           </View>
             
-        </View>
+           
+         </View>
+
+          <View style={{ backgroundColor:'#fffcfc', 
+                                        marginTop:5,
+                                        padding:5,
+                                        borderBottomWidth:0.5,
+                                        borderBottomColor:'#b4b5b3'}}>
+                <View>          
+                    <Text style={{color:'#000cfc',alignSelf:'center',fontSize:15}}>Selected shop : {this.state.selectedShop} </Text>
+                </View>
+           <View style={{flexDirection:'row'}}>
+               <Text>Price :{this.state.topay} </Text>
+              <Text> {this.state.offer!=0?
+                   <Text>{this.state.offer}</Text>
+               :''}</Text>
+ 
+           </View>
+            
+           
+         </View>
+
+         <View style={{ backgroundColor:'#fffcfc', 
+                                        marginTop:5,
+                                        padding:5,
+                                        borderBottomWidth:0.5,
+                                        borderBottomColor:'#b4b5b3'}}>
+                <View>          
+                    <Text style={{color:'#000cfc',alignSelf:'center',fontSize:15}}>Related More Shop </Text>
+                </View>
+           <View style={{flexDirection:'row'}}>
+               <Text>Price :{this.state.topay} </Text>
+              <Text> {this.state.offer!=0?
+                   <Text>{this.state.offer}</Text>
+               :''}</Text>
+ 
+           </View>
+            
+           
+         </View>
+
+          <View style={{ backgroundColor:'#fffcfc', 
+                                        marginTop:5,
+                                        padding:5,
+                                        borderBottomWidth:0.5,
+                                        borderBottomColor:'#b4b5b3'}}>
+                <View>          
+                    <Text style={{color:'#000cfc',alignSelf:'center',fontSize:15}}>Related More Products </Text>
+                </View>
+           <View style={{flexDirection:'row'}}>
+               <Text>Price :{this.state.topay} </Text>
+              <Text> {this.state.offer!=0?
+                   <Text>{this.state.offer}</Text>
+               :''}</Text>
+ 
+           </View>
+            
+           
+         </View>
+
+         </ScrollView>
     
-    
+         <View style={{height:25,backgroundColor:'#ede32d'}}>
+
      </View>
+     </View>
+    
+    
        )
-    }
-    else
-        return(<View></View>)
     }
 }

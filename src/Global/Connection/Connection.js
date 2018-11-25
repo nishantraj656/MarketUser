@@ -3,14 +3,46 @@ import {ToastAndroid} from 'react-native';
 export default class Connection {
 
     constructor(){
-       
+        
         this.state={
-
+          token:''
         } 
  
        //alert('Connection class in js');
 
     }
+
+    tokenSet = async() =>{
+
+      await  fetch('http://gomarket.ourgts.com/public/api/login', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body:{
+          email:"admin@gmail.com",
+          password:"admin"
+        }
+        }).then((response) => response.json())
+            .then((responseJson) => {
+              
+             console.log(responseJson);
+            
+          //  console.log("On shop  value :", value);
+          }).catch((error) => {
+                
+              //  alert("updated slow network");
+             console.log( error.message);
+            // log.error({error:err})
+                value.flag=false;
+                value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
+  
+            }); 
+
+    }
+
+
 
     //fire class 
     //fire command for query in database for current selected shop
@@ -50,7 +82,7 @@ export default class Connection {
            console.log( error.message);
           // log.error({error:err})
               value.flag=false;
-              value.data = "Network request failed" ==error.message?  alert("Check internet connection"):error;
+              value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
 
           }); 
           ToastAndroid.show('Process Complete.. !', ToastAndroid.SHORT);

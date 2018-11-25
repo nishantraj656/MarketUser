@@ -33,13 +33,50 @@ export default class SubCategory extends React.Component
             serachText:"",
             fullData:'',
         }
-        this.conn = new Connection();
+        //this.conn = new Connection();
     }
 
     componentWillMount(){
-        console.log(this.state.sql);
-        this._inslized();
+       // console.log(this.state.sql);
+        this.fetech();
+       // this._inslized();
     }
+
+    fetech = async() =>{
+
+        let value = await AsyncStorage.getItem('categoryID')
+        if(value ==null){
+            
+           return; 
+   
+        }
+
+        await  fetch('http://gomarket.ourgts.com/public/api/gro_subCategory', {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+          },
+          body:JSON.stringify({
+            id:value
+          })
+          }).then((response) => response.json())
+              .then((responseJson) => {
+                
+             //  console.log(responseJson);
+               this.setState({data:responseJson.data.data}) 
+            //  console.log("On shop  value :", value);
+            }).catch((error) => {
+                  
+                //  alert("updated slow network");
+               console.log( error.message);
+              // log.error({error:err})
+                //   value.flag=false;
+                //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
+    
+              }); 
+  
+      }
 
     _inslized=async()=>{ 
         console.log(this.state.sql)
@@ -48,12 +85,12 @@ export default class SubCategory extends React.Component
             this.setState({data:value.data,fullData:value.data});  
             console.log(this.state.data);  
         }
-        this.setState({isEmpty:"List is empty..."})
+        this.setState({isEmpty:"List is empty..."}) 
     }
 
     _storeData=async(subID) =>{
         try{
-            await AsyncStorage.setItem('subID',subID);
+            await AsyncStorage.setItem('subID',JSON.stringify(subID));
             this.state.obj.navigate('ProductList');
         }
         catch(error){
@@ -62,23 +99,23 @@ export default class SubCategory extends React.Component
     }
     _renderIteam=({item})=>{
                 
-        var yourBase64Icon = 'data:image/png;base64,'+item.subcategory_pic;
+      //  console.log(item);
 
         return(
             <View style={{flex:1,padding:5}}>
-                  <TouchableOpacity onPress={()=>{this._storeData(item.subcategory_id) }} >
+                  <TouchableOpacity onPress={()=>{this._storeData(item.gro_subcat_id) }} >
                         <View style={{ flex:1,
                                         backgroundColor:'#f2d56d', 
-                                        padding:5,
+                                        padding:2,
                                        
                                         height:100, 
                                         borderRadius:5,
                                         borderWidth:1,}}>
-                        <View style={{width: '100%',justifyContent:'center',}}>
-                            <Image style={{width: '100%',borderRadius:5,flex:1}} source={{uri:yourBase64Icon}}/>
+                        <View style={{width: '100%',justifyContent:'center',alignSelf:'center'}}>
+                            <Image style={{width: '100%',height:60,width:50,alignSelf:'center'}} source={{uri:item.pic}}/>
                         </View> 
-                        <View style={{alignItems:'center',justifyContent:'center',padding:3,margin:5,flexDirection:'row'}}>
-                            <Text style={{fontSize:14,}}>{item.subcategory_name}</Text>
+                        <View style={{alignItems:'center',justifyContent:'center',padding:1,margin:1,flexDirection:'row'}}>
+                            <Text style={{fontSize:12,}}>{item.subcat_name}</Text>
                         </View>
 
                     </View>
@@ -121,7 +158,7 @@ export default class SubCategory extends React.Component
     
     render(){
     
-        return(<View style={{width:'100%',flex:1,padding:10,}}>
+        return(<View style={{width:'100%',flex:1,backgroundColor:'#2fd827'}}>
             
             <SearchBar
         round

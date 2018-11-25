@@ -4,15 +4,20 @@ import {
   AsyncStorage,
   Button,
   StatusBar,
+  Image,
+  Text,
   StyleSheet,
+  ScrollView,
   View,
+  TouchableOpacity,
 } from 'react-native';
-import { createStackNavigator, createSwitchNavigator,createDrawerNavigator } from 'react-navigation';
+import { createStackNavigator, createSwitchNavigator,createDrawerNavigator,DrawerItems,SafeAreaView } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { HomeMenu } from '../Home/Home';
+import { HomeMenu, Grocery } from '../Home/GroceryMenu';
 import LogoTitle from '../LogoTitle/LogoTitle';
 import BillList from '../Order/OrderList';
 import MyProfile from '../CommanComp/MyProfile';
+import Home from './Home';
 
 
 class MyHomeScreen extends React.Component {
@@ -27,7 +32,27 @@ class MyHomeScreen extends React.Component {
       return (
           <View style={{height:'100%'}}>
             <LogoTitle obj={this.props.navigation} />
-             <HomeMenu/>
+            <Home obj={this.props.navigation}/>  
+          </View>
+        
+      );
+    }
+  }
+
+
+class GroceryScreen extends React.Component {
+    static navigationOptions = {
+      drawerLabel: 'Grocery',
+      drawerIcon: ({ tintColor }) => (
+        <Icon name="home" size={20} color={tintColor} />
+      ),
+    };
+  
+    render() {
+      return (
+          <View style={{height:'100%'}}>
+            <LogoTitle obj={this.props.navigation} />
+             <Grocery/>
               
           </View>
         
@@ -146,6 +171,28 @@ class AboutScreen extends React.Component {
     }
   }
   
+  const CustomDrawerContentComponent = (props) => (
+    <ScrollView>
+      
+      <View style={{backgroundColor:'#660062',height:80}}>
+        <TouchableOpacity onPress={()=>{props.navigation.navigate('Home');props.navigation.toggleDrawer();}}>
+        <View style={{flexDirection:'row',marginTop:50,paddingHorizontal:11}}>
+        <Icon name="home" size={20} color="#ffffff"/>
+        <View style={{paddingLeft:30}}>
+          <Text style={{color:'#ffffff',fontWeight:'500'}}>Home</Text>
+        </View>
+          
+        </View>
+        </TouchableOpacity>
+       
+     </View>
+      <SafeAreaView style={{ flex: 1,}} forceInset={{ top: 'always', horizontal: 'never' }}>
+        <DrawerItems {...props} />
+      </SafeAreaView>
+    </ScrollView>
+  );
+  
+
   const styles = StyleSheet.create({
     icon: {
       width: 24,
@@ -157,7 +204,10 @@ class AboutScreen extends React.Component {
     Home: {
       screen: MyHomeScreen,
     },
-    // Notifications: {
+    Grocery:{
+      screen:GroceryScreen,
+    },
+    // Notifications: 
     //   screen: MyNotificationsScreen,
     // },
     MyAccount:{
@@ -166,6 +216,7 @@ class AboutScreen extends React.Component {
     MyOrder: {
         screen: MyOrderScreen,
       },
+   
     // About: {
     //     screen: AboutScreen,
     //   },
@@ -176,5 +227,6 @@ class AboutScreen extends React.Component {
     //     screen:SettingScreen
     // }
   },{
-    initialRouteName:'Home'
+    initialRouteName:'Home',
+    contentComponent:CustomDrawerContentComponent
   });

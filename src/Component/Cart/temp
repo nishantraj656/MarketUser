@@ -68,7 +68,7 @@ export default class CartDetails extends React.Component{
         console.log(":Items in cart  :"+await AsyncStorage.getItem('List'));
         ToastAndroid.show('Add to cart !', ToastAndroid.SHORT);
 
-        console.log("List of data \n\n\n",data);
+      //  console.log("List of data \n\n\n",data);
         
         } catch (error) {
         // Error saving data
@@ -362,46 +362,32 @@ export default class CartDetails extends React.Component{
     }
 
     }
-        
+      
+    
     
         //Selected item list 
     _renderIteam=({item})=>{
 
         return(
-            <View style={{padding:0,height:150}}>
+            <View style={{borderRadius:10,borderColor:'#191818',borderWidth:0.5}}>
                 
-                <View style={{height:100,width:80,padding:5}}>
-                        <ImageBackground source={{uri: item.uri}} style={{height:"100%",width:"100%"}} >
-                        <View style={{borderRadius:4,width:20,backgroundColor:'#ffffff',alignSelf:'flex-end',borderWidth:0.1,borderColor:'#000000'}}>
-                        <Text style={{alignSelf:'center'}}>{item.Quntity}</Text></View>
-                      
+                <View style={{height:120,width:100,padding:5}}>
+                        <ImageBackground source={{uri: item.uri}} style={{height:110,width:90,borderRadius:10}} >
+                            <View style={{borderRadius:5,width:20,backgroundColor:'#ffffff'}}><Text style={{}}>{item.Quntity}</Text></View>
                         </ImageBackground>
                 </View>  
-                
-            
-                <View style={{ flex:1,
-                                    backgroundColor:'#ffffff', 
-                                    padding:0,
-                                    width:"100%",  
-                                    borderBottomWidth:1,
-                                    borderColor: '#000000',
-                                   
-                                    flexDirection: 'row',}}>
-                     <View style={{flex:1,borderRadius:5}}>
-                       
-                        <View style={{alignItems:'center',justifyContent:'space-between',flexDirection:'row',padding:3,margin:5,}}>
-                         <TouchableHighlight onPress={()=>{this._removeItem(item)}}>
+                <View style={{alignItems:'center',justifyContent:'space-between',flexDirection:'row',padding:3,margin:5,}}>
+                        
+                        <TouchableHighlight onPress={()=>{this._removeItem(item)}}>
                             <View style={{borderWidth:0.5,borderColor:'#3d3d3d',borderRadius:20,backgroundColor:'#ce0000'}}>
                                 <Text style={{color:"#ffffff"}}>Remove</Text>
                             </View>
                         </TouchableHighlight>
 
                     </View>
-
-                   
-                     </View> 
-                     
-                </View>
+                
+ 
+                
                
            
             </View>
@@ -411,37 +397,14 @@ export default class CartDetails extends React.Component{
         
     } 
 
-        //Render price details
-    _renderPrice=({item})=>{
-         return(
-                 
-               
-               <View style={ { backgroundColor:'#ffffff',borderBottomWidth:0.2,justifyContent:'space-between',flexDirection:'row'}}>
-                        <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
-                        <Text style={{fontSize:15}}> {item.Pname}</Text>
-                        </View>
-
-                        <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
-                        <Text style={{fontSize:15}}> {item.Quntity}</Text>
-                        </View>
-
-                        <View style={{alignItems:'center',width:'25%',justifyContent:'space-between',padding:3,margin:5,}}>
-                        <Text style={{fontSize:15}}>{item.Price}</Text>
-                        </View>
-
-                </View>   
-                         
-        );
-    }
-
+   
         //Related shop price 
       
     _renderShop=({item})=>{
                 
 
         return(
-            <TouchableHighlight onPress={()=>{AsyncStorage.setItem('ShopID',item.shop_info_id);this._inslization();}}>
-            <View style={{padding:5,backgroundColor:"#ffffff"}}>
+            <View style={{padding:5,shadowOpacity:5,shadowColor:"#050505"}}>
                                         <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
                                         <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >At: UrduBzar,PO : Ammapali,Near : KaliMandir, Bhagalpur(Bihar), Pin : 813208</Text>
                                         <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
@@ -449,9 +412,12 @@ export default class CartDetails extends React.Component{
                                     <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : 908,56</Text>
                                     
                                         </View> 
-                          <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
+                            <View style={{}}>
+                                       
+                            </View>
+                    <Button title="Continue with this" onPress={()=>{AsyncStorage.setItem('ShopID',item.shop_info_id);this._inslization();}}/>
             </View>
-            </TouchableHighlight>        
+                   
                         
         );
         
@@ -545,26 +511,19 @@ export default class CartDetails extends React.Component{
         }
 
     render(){
-       
-        {if(!this.state.datashop.length)return(<View><Text>Hello</Text></View>)
-            else
-      return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
+        if(this.state.datashop.length)
+      return(<View style={{backgroundColor:"#d1d1d1"}}>
                   
-                    <ScrollView
-                   
-                     
-                    >
-                    <View style={{backgroundColor:"#f9f9f9",padding:5,justifyContent:'center'}}>
-
-                        <View style={{flex:0.5,backgroundColor:"#f9f9f9",marginBottom:5,flexDirection:'row',justifyContent:'center'}}>
+                    <ScrollView>
+                    <View style={{backgroundColor:"#f9f9f9",flexDirection:'row',justifyContent:'center'}}>
                         <View style={{height:150,width:150,padding:5}}>
                         <ImageBackground source={{uri: 'http://www.picaframehsv.com/wp-content/uploads/2014/08/banner.jpg'}} style={{height:"100%",width:"100%"}} />
                         </View>   
                         <View style={{height:150,width:150,padding:5}}>
                         <ImageBackground source={{uri: 'http://www.picaframehsv.com/wp-content/uploads/2014/08/banner.jpg'}} style={{height:"100%",width:"100%"}} />
-                        </View> 
-                        </View> 
-                          <View style={{flex:1}}>
+                        </View>                                  
+                    </View>
+                    <View style={{backgroundColor:'#f9f9f9',padding:5}}>
                                         <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" }</Text>
                                         <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Address : {this.state.datashop !=null? this.state.datashop[0].address:"There is no data" }</Text>
                                         <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Mobile No. :{this.state.datashop !=null? this.state.datashop[0].phone_no:"There is no data" }</Text>
@@ -574,37 +533,17 @@ export default class CartDetails extends React.Component{
                                     <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : 908,56</Text>
                                     
                                         </View> 
-                           
-                        </View>   
-                                                     
-                    </View>
-                  
+                          
+                        </View>
 
-         <View style={{backgroundColor:'#ffffff',padding:10,marginTop:5}}>
-                <View style={{width:'100%',marginTop:10,borderRadius:10,alignSelf:'center',backgroundColor:'#3569ad'}}>
-                <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#f9f9f9'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" } Basket </Text>
-                           
-                </View>
-
-                 <View style={{}}>
-                            <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? this.state.offerAmt+' % off on every sell':''}</Text>
-                           
-                            <View style={{flexDirection:'row'}}>
-                               
-                                <Text style={{fontSize:15,padding:1,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#020202'}} >Total : {this.state.priceTopay} Rs</Text>
-                           
-                                <Text style={{fontSize:10,padding:1,textDecorationLine:'line-through',alignSelf:'center',textShadowColor:'#0815cc',color:'#ba0505'}} > {this.state.offerAmt != '0' ? this.state.sumvalue+' Rs ':''}</Text>
-                           
-                                <Text style={{fontSize:12,padding:1,alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? (this.state.sumvalue - this.state.priceTopay)+' Rs saved':''}</Text>
-                           
-                                
+                <View style={{backgroundColor:'#f9f9f9',marginTop:5}}>
+                    <View style={{width:'100%',marginTop:10,borderRadius:10,alignSelf:'center',backgroundColor:'#3569ad'}}>
+                    <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#f9f9f9'}} >MarketG Basket </Text>
                             
-                            </View>
-                                      
-                            </View>
-            
-
-                <FlatList
+                    </View>
+                
+                
+                    <FlatList
                                 data={this.state.avilableItem}
                                 renderItem={this._renderIteam}
                                 ListFooterComponent={this._renderFoot}
@@ -621,40 +560,41 @@ export default class CartDetails extends React.Component{
                                             <Text>{this.state.isEmpty}</Text>
     
                                             </View>)}}
-
-                                horizontal={true}
+                                horizontal
                             />   
 
-
-
-         </View>
-
-
-         
-         <View style={{backgroundColor:'#ffffff',marginTop:5}}>
-                
-
-                 <View style={{width:'100%',marginTop:10,borderColor:'#3f3f3f', borderWidth:0.5 ,alignSelf:'center',backgroundColor:'#ffffff'}}>
-                <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#000000'}} > PRICE DETAILS </Text>
+                     <View style={{padding:10}}>
+                            <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? this.state.offerAmt+' % off on every sell':''}</Text>
                            
-                </View>
+                            <View style={{flexDirection:'row'}}>
+                               
+                                <Text style={{fontSize:15,padding:1,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#020202'}} >Total : {this.state.priceTopay} Rs</Text>
+                           
+                                <Text style={{fontSize:10,padding:1,textDecorationLine:'line-through',alignSelf:'center',textShadowColor:'#0815cc',color:'#ba0505'}} > {this.state.offerAmt != '0' ? this.state.sumvalue+' Rs ':''}</Text>
+                           
+                                <Text style={{fontSize:12,padding:1,alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? (this.state.sumvalue - this.state.priceTopay)+' Rs saved':''}</Text>
+                           
+                                
+                            
+                            </View>
+                                      
+                    </View>         
 
-            
-                <View style={{backgroundColor:'#06024f',justifyContent:'space-between',padding:3,flexDirection:'row'}}>
-                    <View style={{alignItems:'center',padding:3,width:'25%',margin:5,}} >
-                    <Text style={{fontSize:15,fontWeight:'900',color:'#ffffff'}}> Name</Text>
-                    </View>
-                   
-                    <View style={{alignItems:'center',width:'25%',justifyContent:'space-between',padding:3,margin:5,}}>
-                     <Text style={{fontSize:15,fontWeight:'900',color:'#ffffff'}}>Quantity</Text>
-                    </View>
-                    <View style={{alignItems:'center',width:'25%',justifyContent:'space-between',paddingRight:5,margin:5,}} >
-                    <Text style={{fontSize:15,fontWeight:'900',color:'#ffffff'}}>Price</Text>
-                    </View>
                 </View>
-                <FlatList
+                
+            
+        
+        
+                <View style={{backgroundColor:'#f9f9f9',marginTop:5}}>
+                    <View style={{width:'100%',marginTop:10,borderRadius:10,alignSelf:'center',borderBottomColor:'#dbdbdb'}}>
+                    <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#000000'}} >PRICE DETAILS </Text>
+                            
+                </View>
+                
+                
+                    <FlatList
                                 data={this.state.avilableItem}
-                                renderItem={this._renderPrice}
+                                renderItem={()=>{}}
                                 ListFooterComponent={this._renderFoot}
                                 keyExtractor = {(item)=>{item.productID}}
                                 ListEmptyComponent={()=>{
@@ -669,36 +609,29 @@ export default class CartDetails extends React.Component{
                                             <Text>{this.state.isEmpty}</Text>
     
                                             </View>)}}
+                                horizontal
                             />   
-                
-                <View style={{backgroundColor:'#ffffff',justifyContent:'space-between',padding:3,flexDirection:'row'}}>
-                    <View style={{alignItems:'center',padding:3,margin:5,}} >
-                    <Text style={{fontSize:15,color:'#06024f'}}> Shepping Charge</Text>
-                    </View>
-                   
-                   
-                    <View style={{alignItems:'center',justifyContent:'space-between',paddingRight:5,margin:5,}} >
-                    <Text style={{fontSize:15,color:'#64ed49'}}>Free</Text>
-                    </View>
-                </View>
 
-                <View style={{backgroundColor:'#64ed49',justifyContent:'space-between',padding:3,flexDirection:'row'}}>
-                    <View style={{alignItems:'center',padding:3,margin:5,}} >
-                    <Text style={{fontSize:15,fontWeight:'900',color:'#06024f'}}> Ammount Payable</Text>
-                    </View>
-                   
-                   
-                    <View style={{alignItems:'center',justifyContent:'space-between',paddingRight:5,margin:5,}} >
-                    <Text style={{fontSize:15,fontWeight:'900',color:'#06024f'}}>{this.state.priceTopay}</Text>
-                    </View>
-                </View>
-
-
-
-         </View>
+                     <View style={{padding:10}}>
+                            <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? this.state.offerAmt+' % off on every sell':''}</Text>
                            
+                            <View style={{flexDirection:'row'}}>
+                               
+                                <Text style={{fontSize:15,padding:1,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#020202'}} >Total : {this.state.priceTopay} Rs</Text>
+                           
+                                <Text style={{fontSize:10,padding:1,textDecorationLine:'line-through',alignSelf:'center',textShadowColor:'#0815cc',color:'#ba0505'}} > {this.state.offerAmt != '0' ? this.state.sumvalue+' Rs ':''}</Text>
+                           
+                                <Text style={{fontSize:12,padding:1,alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? (this.state.sumvalue - this.state.priceTopay)+' Rs saved':''}</Text>
+                           
+                                
+                            
+                            </View>
+                                      
+                    </View>         
 
-
+                </View>
+                
+            
 
 
 
@@ -725,13 +658,11 @@ export default class CartDetails extends React.Component{
                                         <Text>{this.state.isEmpty}</Text>
 
                                         </View>)}}
-
-                                ItemSeparatorComponent={()=>{return(<View style={{backgroundColor:'#f56f43',height:0.5,marginBottom:2}}></View>)}}
                             />   
              
                
             </ScrollView>
-           <View style={{flexDirection:'row',justifyContent:'space-around',backgroundColor:'#f7c927'}}>
+           <View style={{flexDirection:'row',justifyContent:'space-around',backgroundColor:'#f7c927',height:100,width:200}}>
            {!this.state.process ?  <Button title="Done" color="#f7c927" onPress={()=>{this.DoneButton()}}/> : <ActivityIndicator size="large" color="#0000ff" />}
 
             <Button title="Refresh" onPress={()=>{this._inslization() }}/>
@@ -741,7 +672,8 @@ export default class CartDetails extends React.Component{
        
         </View>
           )
-        }
+          else
+          return(<View></View>)
     }
 
            //database connection 
@@ -771,3 +703,6 @@ export default class CartDetails extends React.Component{
 
 
 }
+
+
+copiler

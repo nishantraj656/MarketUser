@@ -47,7 +47,6 @@ export default class ProductsList extends React.Component
            start:0,
           loading:true,
           isData:true,
-          imgPath:'http://gomarket.ourgts.com/public/',
           checkboxes:[],
             
         }
@@ -63,44 +62,8 @@ export default class ProductsList extends React.Component
 
     componentDidMount(){
        // console.log(this.state.sql);
-       this.fetech();
-      //  this._inslized();
-    }
-
-    fetech = async() =>{
-
-        let value = await AsyncStorage.getItem('subID')
-        if(value ==null){
-            
-           return; 
-   
-        }
-
-    await  fetch('http://gomarket.ourgts.com/public/api/gro_product', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body:JSON.stringify({
-          id:value
-        })
-        }).then((response) => response.json())
-            .then((responseJson) => {
-              
-             console.log(responseJson);
-             this.setState({data:responseJson.data.data}) 
-          //  console.log("On shop  value :", value);
-          }).catch((error) => {
-                
-              //  alert("updated slow network");
-             console.log( error.message);
-            // log.error({error:err})
-              //   value.flag=false;
-              //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
-  
-            }); 
-
+        
+        this._inslized();
     }
 
     _inslized=async()=>{ 
@@ -121,16 +84,11 @@ export default class ProductsList extends React.Component
 
    
 
-    _storeData=async(PID,info,name,pic) =>{
+    _storeData=async(PID,sID) =>{
         try{
-            await AsyncStorage.setItem('PID',JSON.stringify(PID));
-         //   await AsyncStorage.setItem('ShopID',sID)
-            this.state.obj.navigate('productDetail',{
-                id: PID,
-                info: info,
-                name:name,
-                pic:pic,
-              });
+            await AsyncStorage.setItem('PID',PID);
+            await AsyncStorage.setItem('ShopID',sID)
+            this.state.obj.navigate('productDetail');
         }
         catch(error){
             console.log("Eroor he Product list me ",error);
@@ -180,18 +138,18 @@ export default class ProductsList extends React.Component
     
     _renderIteam=({item})=>{
             
-       // console.log("Product ---",item );
+        console.log("Product ---",item );
      
         
-        let pName = item.gro_product_name;
-    //     let sName = item.sName.split(',')[0];
-         let PID = item.gro_product_list_id;
-    //     let sID = item.ShopID.split(',')[0];
-    //     let unit =item.unit.split(',')[0];
-    //     let price =item.price.split(',')[0];
-    //   //  let Qun = "1"
-    //     let pListID = item.p_list_id.split(',')[0];
-        let uri =item.pic;
+        let pName = item.pName.split(',')[0];
+        let sName = item.sName.split(',')[0];
+        let PID = item.productID.split(',')[0];
+        let sID = item.ShopID.split(',')[0];
+        let unit =item.unit.split(',')[0];
+        let price =item.price.split(',')[0];
+      //  let Qun = "1"
+        let pListID = item.p_list_id.split(',')[0];
+        let uri =item.pic !=null ?item.pic.split(',')[0]:"http";
        
         return(
             
@@ -199,41 +157,41 @@ export default class ProductsList extends React.Component
                                 backgroundColor:'#fcfcfc', 
                                 padding:5,
                                 flexDirection:"row",
-                                height:100, 
+                                height:150, 
                                 borderWidth:0.5,
                                 borderColor:'#cecece'
                                 }}>
 
                       
-                     <View style={{padding:5,width:100, height: 100,borderRadius:5}}>
+                     <View style={{padding:5,width:100, height: 160,borderRadius:5}}>
                    
-                        <Image style={{width:100, height: 150,borderRadius:5,flex:1}} source={{uri:(this.state.imgPath+item.pic)}}/>
+                        <Image style={{width:100, height: 150,borderRadius:5,flex:1}} source={{uri:uri}}/>
                     </View>
 
                     <View style={{flex:1,paddingLeft:10}}>
 
-                    <TouchableOpacity onPress={()=>{this._storeData(PID,item.gro_product_info,item.gro_product_name,(this.state.imgPath+item.pic))}}>
+                    <TouchableOpacity onPress={()=>{this._storeData(PID,sID)}}>
                   
                      <View style={{alignItems:'center', justifyContent:'center',padding:3,flexDirection:'row'}}>
                         <Text style={{fontSize:20,fontWeight:'300'}}>{pName}</Text>
                     </View>
 
                     <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                    <Text style={{fontSize:15,fontWeight:'900',color:'#d2d5db'}}>{item.gro_product_info}</Text>
+                    <Text style={{fontSize:15,fontWeight:'900'}}>Price:{price} Rs/{unit}</Text>
                     </View>
                     
                    
 
-                    {/* <View>
+                    <View>
                     <Text style={{fontSize:15,fontWeight:'500',color:"#720664"}}>{sName}</Text>
                     </View>
                     <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <Text style={{fontSize:15,fontWeight:'900',paddingHorizontal:7,color:'#fcfcfc',backgroundColor:'#02490b'}}>*3.5</Text>
                     <Text style={{fontSize:15,fontWeight:'400',paddingHorizontal:7,color:'#878787',}}>Rating 1,657</Text>
-                    </View> */}
+                    </View>
                   </TouchableOpacity>
                    
-                    {/* <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,height:100,paddingBottom:5}}>
+                    <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,height:100,paddingBottom:5}}>
                         <View style={{borderWidth:1}}>
                             <Picker
                                 selectedValue={this.state.weight}
@@ -260,7 +218,7 @@ export default class ProductsList extends React.Component
                         </View>
                    }
                     </View>
-                    */}
+                   
                     </View>
                 </View>
             
@@ -326,7 +284,7 @@ export default class ProductsList extends React.Component
            
             <ScrollView>  
                         <FlatList
-                                data={this.state.data}
+                                data={this.state.checkboxes}
                                 renderItem={this._renderIteam}
                                 numColumns={1}
                                 keyExtractor={item => item.p_list_id}

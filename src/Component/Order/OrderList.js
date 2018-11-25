@@ -5,6 +5,7 @@ import {createStackNavigator} from 'react-navigation';
 
 import { ScrollView } from 'react-native-gesture-handler';
 import Connection from '../../Global/Connection/Connection';
+import Feedback from '../Feedback/Feedback';
 
 
 
@@ -192,6 +193,7 @@ class CartDetails extends React.Component{
         }
        
         this.conn=new Connection();
+        this.feedback = new Feedback();
         
     }
     
@@ -332,7 +334,7 @@ class CartDetails extends React.Component{
 
             </View>
             
-           
+            {this.feedback._interface()}
        
        
         </View>
@@ -341,10 +343,12 @@ class CartDetails extends React.Component{
 }
 
 const Rocket =createStackNavigator({
-        Home:CartList,
+    Home:{screen:CartList, navigationOptions: () => ({
+        title:'Bill History'  
+    }),},
         Details:CartDetails,     
 },{
-    headerMode:'none'
+    
 });
 
 export default class Order extends React.Component{

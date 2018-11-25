@@ -13,9 +13,11 @@ export default class LogoTitle extends React.Component {
        
     }
 
-    componentWillMount(){
+    componentDidMount(){
         this._Retrive();
     }
+
+    
     
     _Retrive =async()=>{
         try{
@@ -35,11 +37,11 @@ export default class LogoTitle extends React.Component {
 render() {  
     this._Retrive();
   return (
-    <View style={{flexDirection:'row',marginTop:20, height:50,justifyContent:'space-around',backgroundColor:'#110059'}}>
-    <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+    <View style={{flexDirection:'row',marginTop:20, height:50,backgroundColor:'#110059',justifyContent:'space-between'}}>
+    <View style={{flexDirection:'row'}}>
         <TouchableOpacity onPress={()=>{this.state.obj.toggleDrawer()}} style={{alignSelf:'auto',marginRight:20}} >
             <View>
-            <Icon name="format-align-justify" size={40} color="#ffffff" /></View>
+            <Icon name="menu" size={40} color="#ffffff" /></View>
         </TouchableOpacity> 
         <View style={{height:50,width:50,justifyContent:'center'}}>  
          <Image source={require("../../pic/logo.png")} style={{height:50,width:50}}/>
@@ -54,8 +56,10 @@ render() {
         </View>
 
         <View style={{padding:10}}>
-            <View style={{backgroundColor:'#ef0202',borderRadius:15}}><Text style={{color:'#ffffff',alignSelf:'center'}}>{this.state.cartNo}</Text></View>
-              <Icon name="cart" size={20} color="#ffffff" /> 
+            <View style={{backgroundColor:'#ef0202',borderRadius:15}}>
+             <Text style={{color:'#ffffff',alignSelf:'center'}}>{this.state.cartNo}</Text>
+            </View>
+             <Icon name="cart" size={20} color="#ffffff" /> 
         </View>
 
          <View style={{padding:10}}>
