@@ -18,6 +18,7 @@ import LogoTitle from '../LogoTitle/LogoTitle';
 import BillList from '../Order/OrderList';
 import MyProfile from '../CommanComp/MyProfile';
 import Home from './Home';
+import CartDetails from '../Cart/Cart';
 
 
 class MyHomeScreen extends React.Component {
@@ -153,6 +154,27 @@ class MyOrderScreen extends React.Component {
     }
   }
 
+  /** My cart  cart operation */
+class MyCartScreen extends React.Component {
+  static navigationOptions = {
+    drawerLabel: 'My Cart',
+    drawerIcon: ({ tintColor }) => (
+      <Icon name="home" size={20} color={tintColor} />
+    ),
+  };
+
+  render() {
+    return (
+        <View style={{height:'100%'}}>
+          <LogoTitle obj={this.props.navigation} />
+           <CartDetails/>
+            
+        </View>
+      
+    );
+  }
+
+}
 class AboutScreen extends React.Component {
     static navigationOptions = {
       drawerLabel: 'About',
@@ -226,6 +248,9 @@ class AboutScreen extends React.Component {
     // Setting:{
     //     screen:SettingScreen
     // }
+    MyCart:{
+        screen:MyCartScreen,
+    },
   },{
     initialRouteName:'Home',
     contentComponent:CustomDrawerContentComponent

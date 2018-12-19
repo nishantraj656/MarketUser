@@ -13,20 +13,24 @@ export default class LogoTitle extends React.Component {
        
     }
 
-    componentDidMount(){
+    componentWillMount(){
         this._Retrive();
+    }
+    componentDidMount(){
+        
     }
 
     
     
     _Retrive =async()=>{
         try{
-            let v =await  AsyncStorage.getItem('ItemInCart');
+            let v =await  AsyncStorage.getItem('CartList');
            // console.log(v)
             if(v==null){
-                await AsyncStorage.setItem('ItemInCart','0');
+               
             }
-            this.setState({cartNo:v});
+            let l =JSON.parse(v).length;
+            this.setState({cartNo:l});
     
         }catch(error){
             console.log("Error he logoTitle me ",error)
@@ -56,10 +60,13 @@ render() {
         </View>
 
         <View style={{padding:10}}>
+        <TouchableOpacity onPress={()=>{this.state.obj.navigate('MyCart')}}>
             <View style={{backgroundColor:'#ef0202',borderRadius:15}}>
              <Text style={{color:'#ffffff',alignSelf:'center'}}>{this.state.cartNo}</Text>
             </View>
-             <Icon name="cart" size={20} color="#ffffff" /> 
+          
+             <Icon style={{paddingBottom:10}} name="cart" size={20} color="#ffffff" /> 
+        </TouchableOpacity>    
         </View>
 
          <View style={{padding:10}}>

@@ -18,10 +18,10 @@ import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnai
 
 
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
-import Connection from '../../Global/Connection/Connection';
-import { ProductListing, CartPrepare } from '../Cart/ListPrepare';
+import { CartPrepare } from '../../Cart/ListPrepare';
 
-export default class ProductDetails extends React.Component
+
+export default class ShopProductDetails extends React.Component
 {
     constructor(props){
         super(props)
@@ -37,19 +37,21 @@ export default class ProductDetails extends React.Component
             topay:0,
             selectedProduct:0,
         }
-        this.conn=new Connection();
+        
     }
 
     fetech = async() =>{
 
         let value = await AsyncStorage.getItem('PID')
         let product = await AsyncStorage.getItem('Product')
-        if(value ==null && product == null){
+        if(value ==null && product==null){
             
            return; 
    
         }
         product = JSON.parse(product);
+        this.setState({selectedProduct:product});
+        console.log("On shop  value :", this.state.selectedProduct);
         await  fetch('http://gomarket.ourgts.com/public/api/gro_product_shop', {
             method: 'POST',
             headers: {
@@ -62,11 +64,9 @@ export default class ProductDetails extends React.Component
             }).then((response) => response.json())
                 .then((responseJson) => {
                 
-               console.log("Related shop Load ......",responseJson);
-                this.setState({selectedProduct:product});
-              this.setState({data:responseJson.data.data}); 
-              this.setState({selectedShop:responseJson.data.data[0]})
-            // console.log("On shop  value :", this.data);
+                // console.log("Related shop Load ......",responseJson);
+            //  this.setState({data:responseJson.data.data}); 
+             
             }).catch((error) => {
                     
                 //  alert("updated slow network");
@@ -89,9 +89,9 @@ export default class ProductDetails extends React.Component
     }
 
     _selectShop= (item)=>{
-      this.setState({selectedShop:item})
+      this.setState({selectedShop:item.name,price:item.gro_price,offer:item.offer,selectedProduct:item.gro_map_id})
        alert("Select");
-     //  console.log(item);
+       console.log(item);
     }
     
 
@@ -246,7 +246,7 @@ export default class ProductDetails extends React.Component
                                         borderBottomWidth:0.5,
                                         borderBottomColor:'#b4b5b3'}}>
                 <View>          
-                    <Text style={{color:'#000cfc',alignSelf:'center',fontSize:15}}>Related More Shop </Text>
+                    <Text style={{color:'#000cfc',alignSelf:'center',fontSize:15}}>Related Product </Text>
                 </View>
            <View style={{flexDirection:'row'}}>
                {/* <Text>Price :{this.state.topay} </Text>
@@ -300,8 +300,8 @@ export default class ProductDetails extends React.Component
          <View style={{height:50,backgroundColor:'#ede32d',flexDirection:'row',justifyContent:'space-around'}}>
               
                         <View style={{padding:5}}>
-                            <View style={{flexDirection:'row'}}>
-                            <Text style={{}}>Price : {this.state.selectedShop.gro_price*this.state.selectedQunt} </Text>
+                        <View style={{flexDirection:'row'}}>
+                            <Text style={{}}>Price : {this.state.selectedProduct.gro_price*this.state.selectedQunt} </Text>
                             {/* <Text style={{color:'#18ce21'}}>$ {this.state.topay}</Text> */}
                             </View>
                         </View>

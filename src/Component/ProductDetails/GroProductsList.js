@@ -149,7 +149,7 @@ export default class ProductsList extends React.Component
         let price =item.price.split(',')[0];
       //  let Qun = "1"
         let pListID = item.p_list_id.split(',')[0];
-        let uri =item.pic !=null ?item.pic.split(',')[0]:"http";
+        let uri =item.pic !=null ?item.pic.split(',')[0]: "https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0";
        
         return(
             
@@ -287,7 +287,7 @@ export default class ProductsList extends React.Component
                                 data={this.state.checkboxes}
                                 renderItem={this._renderIteam}
                                 numColumns={1}
-                                keyExtractor={item => item.p_list_id}
+                                keyExtractor={item => item.p_list_id.toString()}
                                 ListEmptyComponent={()=>{
                                     if(this.state.isEmpty =='Wait List is Loading.....')
                                      return(<View style={{justifyContent:'center'}}>

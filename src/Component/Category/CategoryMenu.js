@@ -140,7 +140,7 @@ class SubCategoryScreen extends React.Component
         return(<View style={{flex:1,justifyContent:'center'}}><ActivityIndicator size="large" color="#0000ff" />
         </View>);
     }
-}
+} 
 
 class ProductDetailsScreen extends React.Component
 {

@@ -706,3 +706,17 @@ export default class CartDetails extends React.Component{
 
 
 copiler
+
+/**** temp data */
+ Object {
+[01:37:42]         "address": "ABCD",
+[01:37:42]         "city": "Beeru",
+[01:37:42]         "created_at": "2018-11-14 07:49:22",
+[01:37:42]         "gro_shop_info_id": 1,
+[01:37:42]         "location": "kfjdkl",
+[01:37:42]         "name": "Beeru",
+[01:37:42]         "rating": 4,
+[01:37:42]         "state": "Bihar",
+[01:37:42]         "updated_at": null,
+[01:37:42]         "user_id": 1,
+[01:37:42]       },

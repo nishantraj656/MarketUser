@@ -15,12 +15,12 @@ import {
         } from 'react-native';
 
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
-import Connection from '../../Global/Connection/Connection';
+
 import { SearchBar } from 'react-native-elements'
 
 
 
-export default class SubCategory extends React.Component
+export default class ShopSubCategory extends React.Component
 {
     constructor(props){
         super(props);
@@ -44,21 +44,24 @@ export default class SubCategory extends React.Component
 
     fetech = async() =>{
 
-        let value = await AsyncStorage.getItem('categoryID')
-        if(value ==null){
+        let value = await AsyncStorage.getItem('ShopID')
+       
+        let id = await AsyncStorage.getItem('categoryID')
+        if(value ==null && id == null){
             
            return; 
    
         }
 
-        await  fetch('http://gomarket.ourgts.com/public/api/gro_subCategory', {
+        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/sub', {
           method: 'POST',
           headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
           },
           body:JSON.stringify({
-            id:value
+            Shopid:value, 
+            id:id
           })
           }).then((response) => response.json())
               .then((responseJson) => {
@@ -95,7 +98,7 @@ export default class SubCategory extends React.Component
             this.state.obj.navigate('ProductList');
         }
         catch(error){
-            console.log("Eroor he Product list me ",error);
+            console.log("Eroor he Product subs",error);
         }
     }
     

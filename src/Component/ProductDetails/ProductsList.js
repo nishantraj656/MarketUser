@@ -88,8 +88,8 @@ export default class ProductsList extends React.Component
         }).then((response) => response.json())
             .then((responseJson) => {
               
-             console.log(responseJson);
-             this.setState({data:responseJson.data.data}) 
+            console.log("Product List Load.....",responseJson);
+             this.setState({data:responseJson.data.data,fullData:responseJson.data.data}) 
           //  console.log("On shop  value :", value);
           }).catch((error) => {
                 
@@ -121,15 +121,15 @@ export default class ProductsList extends React.Component
 
    
 
-    _storeData=async(PID,info,name,pic) =>{
+    _storeData=async(item) =>{
         try{
-            await AsyncStorage.setItem('PID',JSON.stringify(PID));
-         //   await AsyncStorage.setItem('ShopID',sID)
+            await AsyncStorage.setItem('PID',JSON.stringify(item.gro_product_list_id));
+            await AsyncStorage.setItem('Product',JSON.stringify(item));
             this.state.obj.navigate('productDetail',{
-                id: PID,
-                info: info,
-                name:name,
-                pic:pic,
+                id: item.gro_product_list_id,
+                info:item.gro_product_info,
+                name:item.gro_product_name,
+                pic:this.state.imgPath+item.pic,
               });
         }
         catch(error){
@@ -191,7 +191,12 @@ export default class ProductsList extends React.Component
     //     let price =item.price.split(',')[0];
     //   //  let Qun = "1"
     //     let pListID = item.p_list_id.split(',')[0];
-        let uri =item.pic;
+    let uri;
+    try {
+      item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=this.state.imgPath+item.pic;  
+    } catch (error) {
+        uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0"
+    }
        
         return(
             
@@ -207,12 +212,12 @@ export default class ProductsList extends React.Component
                       
                      <View style={{padding:5,width:100, height: 100,borderRadius:5}}>
                    
-                        <Image style={{width:100, height: 150,borderRadius:5,flex:1}} source={{uri:(this.state.imgPath+item.pic)}}/>
+                        <Image style={{width:100, height: 150,borderRadius:5,flex:1}} source={{uri:uri}}/>
                     </View>
 
                     <View style={{flex:1,paddingLeft:10}}>
 
-                    <TouchableOpacity onPress={()=>{this._storeData(PID,item.gro_product_info,item.gro_product_name,(this.state.imgPath+item.pic))}}>
+                    <TouchableOpacity onPress={()=>{this._storeData(item)}}>
                   
                      <View style={{alignItems:'center', justifyContent:'center',padding:3,flexDirection:'row'}}>
                         <Text style={{fontSize:20,fontWeight:'300'}}>{pName}</Text>
@@ -222,7 +227,9 @@ export default class ProductsList extends React.Component
                     <Text style={{fontSize:15,fontWeight:'900',color:'#d2d5db'}}>{item.gro_product_info}</Text>
                     </View>
                     
-                   
+                   <View>
+                   <Text style={{fontSize:12,fontWeight:'300'}}>Item Id :{PID}</Text>
+                   </View>
 
                     {/* <View>
                     <Text style={{fontSize:15,fontWeight:'500',color:"#720664"}}>{sName}</Text>
@@ -289,7 +296,7 @@ export default class ProductsList extends React.Component
              let local = this.state.fullData;
              let temp =[];
              local.forEach(element => {
-                if(element.pName.split(',')[0].toUpperCase().search(text.toUpperCase()) != -1 || element.sName.split(',')[0].toUpperCase().search(text.toUpperCase()) != -1 || element.price.split(',')[0].toUpperCase().search(text.toUpperCase()) != -1 ){
+                if(element.gro_product_name.toUpperCase().search(text.toUpperCase()) != -1 || element.gro_product_info.toUpperCase().search(text.toUpperCase()) != -1  ){
                     temp.push(element);
                     console.log(element)
                 } else{ console.log(element)} 
@@ -329,7 +336,7 @@ export default class ProductsList extends React.Component
                                 data={this.state.data}
                                 renderItem={this._renderIteam}
                                 numColumns={1}
-                                keyExtractor={item => item.p_list_id}
+                                keyExtractor={item => item.gro_product_list_id.toString()}
                                 ListEmptyComponent={()=>{
                                     if(this.state.isEmpty =='Wait List is Loading.....')
                                      return(<View style={{justifyContent:'center'}}>

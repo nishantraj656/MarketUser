@@ -1,8 +1,9 @@
 import React from 'react'
-import { ToastAndroid,AsyncStorage,Text,ImageBackground, View,Button,FlatList,ActivityIndicator,TouchableHighlight } from 'react-native';
+import { ToastAndroid,AsyncStorage,Text,ImageBackground,Image, View,Button,FlatList,ActivityIndicator,TouchableHighlight } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Connection from '../../Global/Connection/Connection';
-import { listReturn } from './ListPrepare';
+import { CartRemoveItem } from './ListPrepare';
+//import { listReturn } from './ListPrepare';
 
 const quer2=null;
 
@@ -29,19 +30,89 @@ export default class CartDetails extends React.Component{
             cartItem:0, //No. of item in cart    
             offerAmt:10,
             priceTopay:0,
+            imgPath:'http://gomarket.ourgts.com/public/',
+            GrocerySelectedProduct:[], //Selected Grocery Product
+            GroceryShop:[] //Selected Grocery Product
         }
-        this.conn =new Connection();
+       // this.conn =new Connection();
        
     }
 
-   componentWillMount(){
-        this._inslization();
-       
-    }
 
     componentDidMount(){
-        this._inslization();
+       this._inslization();
+       this.fetechShopList();
+       this.fetchPrice();
+    }
+
+    /** Shop List  */
+    fetechShopList = async() =>{
+
        
+        
+        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/List', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+           
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                
+               // console.log("Shop List Load ......",responseJson);
+              this.setState({GroceryShop:responseJson.data.data}); 
+            //  console.log("On shop  value :", value);
+            }).catch((error) => {
+                    
+                //  alert("updated slow network");
+                console.log( error.message);
+                // log.error({error:err})
+                //   value.flag=false;
+                //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
+    
+                }); 
+
+    }
+
+     /** fetch price  */
+     fetchPrice = async() =>{
+
+        let value = await AsyncStorage.getItem('ShopID')
+        
+        if(value ==null ){
+            
+           return; 
+   
+        }
+       
+        
+        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/product/price', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body:JSON.stringify({
+                id:this.state.GrocerySelectedProduct,
+                Shopid:JSON.parse(value)
+                })
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                
+                console.log("PriceList Load......",responseJson);
+              this.setState({avilableItem:responseJson.data});
+           
+            }).catch((error) => {
+                    
+                //  alert("updated slow network");
+                console.log( error.message);
+                // log.error({error:err})
+                //   value.flag=false;
+                //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
+    
+                }); 
+
     }
 
       // It will add the list to the cart with item number 
@@ -180,13 +251,14 @@ export default class CartDetails extends React.Component{
         try{
            
             let shopID=await AsyncStorage.getItem('ShopID');
-            let item = await AsyncStorage.getItem('ItemInCart');
-            await this.setState({selectedShopID:shopID,cartItem:item});
-            this.fireForCurrentShopOffer();
+            let CartList = await AsyncStorage.getItem('CartList');
+            CartList = JSON.parse(CartList);
+           this.setState({GrocerySelectedProduct:CartList});
+            /**  this.fireForCurrentShopOffer();
             this.DataCreater();
             this.FireForRemaningShop();
             this.fireForCurrentShop();
-            this.setState({isEmpty:'List is empty'})
+            this.setState({isEmpty:'List is empty'})*/
            
         }catch(error){
             //error part
@@ -366,44 +438,47 @@ export default class CartDetails extends React.Component{
     
         //Selected item list 
     _renderIteam=({item})=>{
-
+       // console.log(item);
+       /** Output is
+        * Object {
+                    "Quantity": 3,
+                    "gro_map_id": 56,
+                    "gro_price": 100,
+                    "gro_product_info": "Product data change ",
+                    "gro_product_list_id": 43,
+                    "gro_product_name": "Maggi Oats Noodles",
+                    "pic": "all_product_pics/noodles_n_sauce/Maggi Oats Noodles.jpg",
+                    "quantity": 300,
+                }
+        */
+       let uri;
+       try {
+         item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=this.state.imgPath+item.pic;  
+       } catch (error) {
+           uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0"
+       }
+      // console.log(uri);
         return(
-            <View style={{padding:0,height:150}}>
+            <View style={{padding:0,height:70}}>
                 
-                <View style={{height:100,width:80,padding:5}}>
-                        <ImageBackground source={{uri: item.uri}} style={{height:"100%",width:"100%"}} >
+                 <View style={{height:70,width:80,padding:5}}>
+                    <ImageBackground style={{height:70,width:50,resizeMode: 'contain'}} source={{uri:uri}}>
+                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{borderRadius:4,width:20,backgroundColor:'#ffffff',alignSelf:'flex-end',borderWidth:0.1,borderColor:'#000000'}}>
-                        <Text style={{alignSelf:'center'}}>{item.Quntity}</Text></View>
-                      
-                        </ImageBackground>
-                </View>  
-                
-            
-                <View style={{ flex:1,
-                                    backgroundColor:'#ffffff', 
-                                    padding:0,
-                                    width:"100%",  
-                                    borderBottomWidth:1,
-                                    borderColor: '#000000',
-                                   
-                                    flexDirection: 'row',}}>
-                     <View style={{flex:1,borderRadius:5}}>
-                       
-                        <View style={{alignItems:'center',justifyContent:'space-between',flexDirection:'row',padding:3,margin:5,}}>
-                         <TouchableHighlight onPress={()=>{this._removeItem(item)}}>
-                            <View style={{borderWidth:0.5,borderColor:'#3d3d3d',borderRadius:20,backgroundColor:'#ce0000'}}>
-                                <Text style={{color:"#ffffff"}}>Remove</Text>
-                            </View>
+                        <TouchableHighlight onPress={()=>{CartRemoveItem(item);this._inslization()}}>
+                           <Text style={{fontWeight:'900',fontSize:14,alignSelf:'center',color:'#ce0000'}}>X</Text>
                         </TouchableHighlight>
-
-                    </View>
-
-                   
-                     </View> 
-                     
-                </View>
-               
-           
+                        </View>
+                        <View style={{borderRadius:4,width:20,backgroundColor:'#ffffff',alignSelf:'flex-end',borderWidth:0.1,borderColor:'#000000'}}>
+                            <Text style={{alignSelf:'center'}}>{item.Quantity}</Text>
+                        </View>
+                        </View>
+                      </ImageBackground>
+                       
+                    </View>  
+                
+   
+                
             </View>
                    
                         
@@ -438,15 +513,29 @@ export default class CartDetails extends React.Component{
       
     _renderShop=({item})=>{
                 
-
+        // console.log(item);
+        /**
+         *  Object {
+                        "address": "ABCD",
+                        "city": "Beeru",
+                        "created_at": "2018-11-14 07:49:22",
+                        "gro_shop_info_id": 1,
+                        "location": "kfjdkl",
+                        "name": "Beeru",
+                        "rating": 4,
+                        "state": "Bihar",
+                        "updated_at": null,
+                        "user_id": 1,
+                    }
+         */
         return(
             <TouchableHighlight onPress={()=>{AsyncStorage.setItem('ShopID',item.shop_info_id);this._inslization();}}>
             <View style={{padding:5,backgroundColor:"#ffffff"}}>
                                         <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
-                                        <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >At: UrduBzar,PO : Ammapali,Near : KaliMandir, Bhagalpur(Bihar), Pin : 813208</Text>
+                                        <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >{item.address}</Text>
                                         <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
-                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*3.5</Text>
-                                    <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : 908,56</Text>
+                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{item.rating}</Text>
+                                    <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : {Math.random()} K</Text>
                                     
                                         </View> 
                           <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
@@ -546,8 +635,6 @@ export default class CartDetails extends React.Component{
 
     render(){
        
-        {if(!this.state.datashop.length)return(<View><Text>Hello</Text></View>)
-            else
       return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
                   
                     <ScrollView
@@ -565,9 +652,9 @@ export default class CartDetails extends React.Component{
                         </View> 
                         </View> 
                           <View style={{flex:1}}>
-                                        <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" }</Text>
+                                        {/* <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" }</Text>
                                         <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Address : {this.state.datashop !=null? this.state.datashop[0].address:"There is no data" }</Text>
-                                        <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Mobile No. :{this.state.datashop !=null? this.state.datashop[0].phone_no:"There is no data" }</Text>
+                                        <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Mobile No. :{this.state.datashop !=null? this.state.datashop[0].phone_no:"There is no data" }</Text> */}
                                         
                                         <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
                                         <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*3.5</Text>
@@ -582,30 +669,16 @@ export default class CartDetails extends React.Component{
 
          <View style={{backgroundColor:'#ffffff',padding:10,marginTop:5}}>
                 <View style={{width:'100%',marginTop:10,borderRadius:10,alignSelf:'center',backgroundColor:'#3569ad'}}>
-                <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#f9f9f9'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" } Basket </Text>
+                {/* <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#f9f9f9'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" } Basket </Text> */}
                            
                 </View>
 
-                 <View style={{}}>
-                            <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? this.state.offerAmt+' % off on every sell':''}</Text>
-                           
-                            <View style={{flexDirection:'row'}}>
-                               
-                                <Text style={{fontSize:15,padding:1,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#020202'}} >Total : {this.state.priceTopay} Rs</Text>
-                           
-                                <Text style={{fontSize:10,padding:1,textDecorationLine:'line-through',alignSelf:'center',textShadowColor:'#0815cc',color:'#ba0505'}} > {this.state.offerAmt != '0' ? this.state.sumvalue+' Rs ':''}</Text>
-                           
-                                <Text style={{fontSize:12,padding:1,alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? (this.state.sumvalue - this.state.priceTopay)+' Rs saved':''}</Text>
-                           
-                                
-                            
-                            </View>
-                                      
-                            </View>
+                <Text>Available Item Into the cart</Text>
+            
             
 
                 <FlatList
-                                data={this.state.avilableItem}
+                                data={this.state.GrocerySelectedProduct}
                                 renderItem={this._renderIteam}
                                 ListFooterComponent={this._renderFoot}
                                 keyExtractor = {(item)=>{item.productID}}
@@ -639,6 +712,23 @@ export default class CartDetails extends React.Component{
                            
                 </View>
 
+                <View style={{}}>
+                            <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? this.state.offerAmt+' % off on every sell':''}</Text>
+                           
+                            <View style={{flexDirection:'row'}}>
+                               
+                                <Text style={{fontSize:15,padding:1,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#020202'}} >Total : {this.state.priceTopay} Rs</Text>
+                           
+                                <Text style={{fontSize:10,padding:1,textDecorationLine:'line-through',alignSelf:'center',textShadowColor:'#0815cc',color:'#ba0505'}} > {this.state.offerAmt != '0' ? this.state.sumvalue+' Rs ':''}</Text>
+                           
+                                <Text style={{fontSize:12,padding:1,alignSelf:'center',textShadowColor:'#0815cc',color:'#01701c'}} > {this.state.offerAmt != '0' ? (this.state.sumvalue - this.state.priceTopay)+' Rs saved':''}</Text>
+                           
+                                
+                            
+                            </View>
+                                      
+                </View>
+                <Text>Available Item In the selected Shop</Text>
             
                 <View style={{backgroundColor:'#06024f',justifyContent:'space-between',padding:3,flexDirection:'row'}}>
                     <View style={{alignItems:'center',padding:3,width:'25%',margin:5,}} >
@@ -708,7 +798,7 @@ export default class CartDetails extends React.Component{
                 </View>
 
                 <FlatList
-                                data={this.state.avilableShop}
+                                data={this.state.GroceryShop}
                                 renderItem={this._renderShop}
                                 keyExtractor={item => item.shop_info_id}                           
                                 
@@ -741,7 +831,7 @@ export default class CartDetails extends React.Component{
        
         </View>
           )
-        }
+        
     }
 
            //database connection 

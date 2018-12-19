@@ -45,7 +45,7 @@ class CartScreen extends React.Component {
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Details!</Text>
       </View>
-    );
+    ); 
   }
 }
 

@@ -82,9 +82,11 @@ class AuthLoadingScreen extends React.Component {
   _storeData = async () => {
     try {
   
-   
-        // We have data!!
-       // await AsyncStorage.setItem('ItemInCart', '0');
+    let value =  await AsyncStorage.getItem('CartList');
+    if(value == null){
+        
+       await AsyncStorage.setItem('CartList', JSON.stringify([]));
+      }
       // await AsyncStorage.setItem('List','')
     
     } catch (error) {

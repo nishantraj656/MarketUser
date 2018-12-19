@@ -2,18 +2,20 @@ import React from 'react';
 import {
             ActivityIndicator,
             AsyncStorage,
-            Button,
+           
             StatusBar,
             StyleSheet,
             TouchableOpacity,
             Image,
             View,
-            Text,
+           
             FlatList,
             ScrollView
         } from 'react-native';
 import Connection from '../../Global/Connection/Connection';
 import { SearchBar } from 'react-native-elements'
+import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
+
 
 const sql="SELECT * from shop_info_table";
 
@@ -27,13 +29,42 @@ export default class ShopList extends React.Component{
             serachText:"",
             fullData:'',
         }
-        this.conn = new Connection();
+        //this.conn = new Connection();
     }
 
     
-    componentWillMount(){
+    componentDidMount(){
        
-        this._inslized();
+        this.fetech();
+    }
+
+    fetech = async() =>{
+
+       
+        
+        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/List', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+           
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                
+                console.log("Shop List Load ......",responseJson);
+              this.setState({data:responseJson.data.data}); 
+            //  console.log("On shop  value :", value);
+            }).catch((error) => {
+                    
+                //  alert("updated slow network");
+                console.log( error.message);
+                // log.error({error:err})
+                //   value.flag=false;
+                //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
+    
+                }); 
+
     }
 
     _inslized=async()=>{ 
@@ -48,7 +79,7 @@ export default class ShopList extends React.Component{
     _storeData=async(sID) =>{
         try{
          
-            await AsyncStorage.setItem('ShopID',sID)
+            await AsyncStorage.setItem('ShopID',JSON.stringify(sID))
             this.state.obj.navigate('Category');
         }
         catch(error){
@@ -59,33 +90,42 @@ export default class ShopList extends React.Component{
 
     _renderIteam=({item})=>{
                 
-        var yourBase64Icon = 'data:image/png;base64,'+item.subcategory_pic;
-
+        let uri;
+        try {
+          item.pic == null ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=item.pic;  
+        } catch (error) {
+            uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0"
+        }
         return(
-            <View style={{flex:1,}}>
-                  <TouchableOpacity onPress={()=>{this._storeData(item.shop_info_id)}} >
-                    <View style={{  flex:1,
-                                        backgroundColor:'#f2d56d', 
-                                        padding:5,
-                                        width:"100%", 
-                                        height:150, 
-                                        borderRadius:5,
-                                        borderWidth:1,}}>
-                        <View style={{width: '100%', height: 100,justifyContent:'center',}}>
-                            <Image style={{width: '100%', height: 100,borderRadius:5,flex:1}} source={{uri:yourBase64Icon}}/>
-                        </View> 
-                        <View style={{alignItems:'center',justifyContent:'center',padding:3,margin:5,flexDirection:'row'}}>
-                            <Text style={{fontSize:20,fontWeight:'600'}}>{item.name}</Text>
-                        </View>
-
+                
+              <List style={{backgroundColor:'#f9f9f9'}}>
+                <ListItem avatar>
+                <Left>
+                <Thumbnail large source={{uri: uri}} />
+                </Left>
+                  <Body style={{backgroundColor:"#f9f9f9"}}>
+                  <TouchableOpacity onPress={()=>{this._storeData(item.gro_shop_info_id);}}>
+                    <View>
+                        <Text>{item.name}</Text>
+                        <Text note>Address : {item.address}</Text>
                     </View>
-                    
-                </TouchableOpacity>
-                <Button title="Details" onPress={()=>{   this.state.obj.navigate('ShopDetail');  }}/>
-            </View>           
+                    <View style={{flexDirection:'row',alignItems:'center'}}>
                         
-        );
-        
+                        {/* <View>
+                        <Text note>Ratting : {item.address}</Text>
+                        </View> */}
+                    </View>
+                    </TouchableOpacity>
+                  </Body>
+                  <Right>
+                      <View style={{backgroundColor:"#09c416",padding:10, justifyContent:'center'}}>
+                       <Text style={{fontWeight:"900",color:'#ffffff'}}>{item.rating} *</Text> 
+                      </View>
+                  </Right>
+                </ListItem>
+              </List>
+              
+            );
     }   
 
       
@@ -133,7 +173,7 @@ export default class ShopList extends React.Component{
                          <FlatList
                             data={this.state.data}
                             renderItem={this._renderIteam}
-                            keyExtractor={item => item.shop_info_id}
+                            keyExtractor={item => item.gro_shop_info_id.toString()}
                             ListEmptyComponent={()=>{return(<View style={{justifyContent:'center'}}>
                             <ActivityIndicator size="large" color="#0000ff" />
                             <Text>Wait List is Loading.....</Text>
