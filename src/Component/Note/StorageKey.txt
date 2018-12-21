@@ -11,6 +11,10 @@ costID - for customer id
 mainID - for main category
 CartList - for cart list
 Product - for store selected product
+loginController - for store login part
+auth - for store login
+resCartList - restaurant
+ResShopID - selectd Restaurant shopId 
 6209734084
  
 for add to car list

@@ -132,7 +132,7 @@ export default class ShopProductDetails extends React.Component
                     </View>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <View>
-                         <Text>Price {item.gro_price}</Text>
+                         <Text>Price <Icon name={'currency-inr'} size={15}/> {item.gro_price}</Text>
                         </View>
                         <View >
                          <Text style={{color:"#0b700a"}}>offer : {item.offer}% off</Text>
@@ -160,12 +160,13 @@ export default class ShopProductDetails extends React.Component
      }
 */
     render(){
-        let pName,price,shopName,unit,sID,pID,Qun,desc,pListID;
+     
         const { navigation } = this.state.obj;
          const itemId = navigation.getParam('id', 'NO-ID');
          const info = navigation.getParam('info', 'some default value');
          const name = navigation.getParam('name', 'some default value');
          const pic = navigation.getParam('pic', 'some default value');
+         const unitname = navigation.getParam('unit','');
        // alert(pic);
        
 
@@ -209,7 +210,7 @@ export default class ShopProductDetails extends React.Component
                                         borderBottomColor:'#b4b5b3'}}>
                 <View style={{flexDirection:'row'}}>          
                     <Text>Quntity :  </Text>
-                    <Text style={{color:'#0b700a'}}>{this.state.selectedQunt}</Text>
+                    <Text style={{color:'#0b700a'}}>{this.state.selectedQunt} {unitname}</Text>
                     <View style={{paddingHorizontal:10}}></View>
                     <Button title="   -   " onPress={()=>{let qunt=this.state.selectedQunt-1; qunt>1?'':qunt=1; this.setState({selectedQunt:qunt})}}/>
                     <View style={{borderWidth:1,width:50,alignItems:'center'}}><Text>{this.state.selectedQunt}</Text></View>                        
@@ -301,7 +302,7 @@ export default class ShopProductDetails extends React.Component
               
                         <View style={{padding:5}}>
                         <View style={{flexDirection:'row'}}>
-                            <Text style={{}}>Price : {this.state.selectedProduct.gro_price*this.state.selectedQunt} </Text>
+                            <Text style={{}}>Price :<Icon name={'currency-inr'} size={15}/> {this.state.selectedProduct.gro_price*this.state.selectedQunt} </Text>
                             {/* <Text style={{color:'#18ce21'}}>$ {this.state.topay}</Text> */}
                             </View>
                         </View>

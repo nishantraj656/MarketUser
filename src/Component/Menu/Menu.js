@@ -19,6 +19,7 @@ import BillList from '../Order/OrderList';
 import MyProfile from '../CommanComp/MyProfile';
 import Home from './Home';
 import CartDetails from '../Cart/Cart';
+import { RestaurantTab } from '../Restaurant/RestaurantTab';
 
 
 class MyHomeScreen extends React.Component {
@@ -39,6 +40,24 @@ class MyHomeScreen extends React.Component {
       );
     }
   }
+
+class MyRestaurantScreen extends React.Component{
+  static navigationOptions = {
+    drawerLabel:'Restaurant',
+    drawerIcon: ({tintColor}) =>(
+      <Icon name="coffee" size={20} color={tintColor}/>
+    )
+  };
+  render() {
+    return (
+        <View style={{height:'100%'}}>
+          <LogoTitle obj={this.props.navigation} />
+          <RestaurantTab />  
+        </View>
+      
+    );
+  }
+}
 
 
 class GroceryScreen extends React.Component {
@@ -229,9 +248,9 @@ class AboutScreen extends React.Component {
     Grocery:{
       screen:GroceryScreen,
     },
-    // Notifications: 
-    //   screen: MyNotificationsScreen,
-    // },
+    Restaurant:{ 
+      screen:MyRestaurantScreen,
+    },
     MyAccount:{
         screen:MyAccountScreen,
     }, 

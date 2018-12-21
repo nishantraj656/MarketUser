@@ -164,7 +164,7 @@ _addQuantity=(index) =>{
 
 }
 
-
+ 
 _subQuantity=(index) =>{
     const {checkboxes} = this.state;
   
@@ -304,6 +304,7 @@ _renderIteam=({item})=>{
                 info:item.gro_product_info,
                 name:item.gro_product_name,
                 pic:this.state.imgPath+item.pic,
+                unit:item.unit_name
               });
         }
         catch(error){
@@ -366,7 +367,7 @@ _renderIteam=({item})=>{
                                 data={this.state.checkboxes}
                                 renderItem={this._renderIteam}
                                 numColumns={1}
-                                keyExtractor={item => item.gro_product_list_id.toString()}
+                                keyExtractor={item => item.index.toString()}
                                 ListEmptyComponent={()=>{
                                     if(this.state.isEmpty =='Wait List is Loading.....')
                                      return(<View style={{justifyContent:'center'}}>

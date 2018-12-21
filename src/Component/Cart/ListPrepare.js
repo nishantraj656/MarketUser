@@ -51,7 +51,8 @@ export  async function ProductListing(productID,shopID,Quntity,Unit,Price,pListI
 
         try {
 
-        //  await AsyncStorage.setItem('CartList',JSON.stringify([]));
+         // await AsyncStorage.setItem('CartList',JSON.stringify([]));
+          console.log(item);
            
            let cartValue =[];
             let temp =item;
@@ -121,4 +122,82 @@ export  async function ProductListing(productID,shopID,Quntity,Unit,Price,pListI
         console.log("Error in cart list",error.message());
     } 
     
+}
+
+    /**Restaurant cart Preprae */
+export async function ResCartPrepare(item,quantity){
+
+    try {
+
+     // await AsyncStorage.setItem('CartList',JSON.stringify([]));
+      console.log(item);
+       
+       let cartValue =[];
+        let temp =item;
+            temp['Quantity']=quantity;
+            temp['flag']=true;
+        let value = await AsyncStorage.getItem('resCartList');
+        if(value == null){
+            cartValue.push(temp);
+            await AsyncStorage.setItem('CartList',JSON.stringify(cartValue));
+        } 
+        else{
+            let flag=false;
+            let tempArray = JSON.parse(value);
+            for(var i=0;i<tempArray.length;i++){
+                let tempValue = tempArray[i];
+                if(tempValue.gro_map_id == temp.gro_map_id){
+                     tempArray[i] = temp;
+                    flag=true;
+                    console.log("update ",temp.gro_map_id);
+                    break;
+               }
+            }
+            if(!flag){
+                tempArray.push(temp);
+                console.log("Neww add");
+            }
+            console.log(tempArray);
+            await AsyncStorage.setItem('CartList',JSON.stringify(tempArray));
+        }
+       
+    } catch (error) {
+        console.log("Error in cart list",error.message());
+    } 
+    
+}
+
+/**Restaurant cart remove product */
+export async function ResCartRemoveItem(item){
+
+try {
+
+ //   await AsyncStorage.setItem('CartList',JSON.stringify([]));
+   
+   let cartValue =[];
+   
+    let value = await AsyncStorage.getItem('CartList');
+    if(value == null){
+       return
+    } 
+    else{
+        let flag=false;
+        let tempArray = JSON.parse(value);
+        for(var i=0;i<tempArray.length;i++){
+            let tempValue = tempArray[i];
+            if(tempValue.gro_map_id != item.gro_map_id){
+                 
+                cartValue.push(tempArray[i]) 
+                
+           }
+        }
+       
+        console.log(tempArray);
+        await AsyncStorage.setItem('CartList',JSON.stringify(cartValue));
+    }
+   
+} catch (error) {
+    console.log("Error in cart list",error.message());
+} 
+
 }

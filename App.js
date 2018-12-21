@@ -15,6 +15,7 @@ class SignInScreen extends React.Component {
   static navigationOptions = {
     title: 'Please sign in',
   };
+ 
 
   render() {
     return (
@@ -77,6 +78,7 @@ class AuthLoadingScreen extends React.Component {
     super(); 
     this._bootstrapAsync();
     this._storeData();
+
   }
 
   _storeData = async () => {
@@ -100,7 +102,7 @@ class AuthLoadingScreen extends React.Component {
   _bootstrapAsync = async () => {
      //await AsyncStorage.setItem('key_login_status_market_g','false');
     const userToken = await AsyncStorage.getItem('key_login_status_market_g');
-
+    await AsyncStorage.setItem('auth',JSON.stringify(this.props.navigation));
     // This will switch to the App screen or Auth screen and this loading
     // screen will be unmounted and thrown away.
    // this.props.navigation.navigate(userToken=='true' ? 'App' :'Auth');

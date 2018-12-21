@@ -130,6 +130,7 @@ export default class ProductsList extends React.Component
                 info:item.gro_product_info,
                 name:item.gro_product_name,
                 pic:this.state.imgPath+item.pic,
+                unit:item.unit_name
               });
         }
         catch(error){

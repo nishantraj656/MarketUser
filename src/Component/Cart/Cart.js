@@ -1,8 +1,10 @@
 import React from 'react'
 import { ToastAndroid,AsyncStorage,Text,ImageBackground,Image, View,Button,FlatList,ActivityIndicator,TouchableHighlight } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Connection from '../../Global/Connection/Connection';
+
 import { CartRemoveItem } from './ListPrepare';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Login from '../Login';
 //import { listReturn } from './ListPrepare';
 
 const quer2=null;
@@ -20,11 +22,22 @@ export default class CartDetails extends React.Component{
             sumvalue:'0', //total price of selected shop
             fullData:[], // all data of cart with complete data
             avilableShop:[],    // list of all shop 
-            selectedShopID:'',  // id of current selected shop  
+            selectedShop: {
+                                "address": "ABCD",
+                                "city": "Beeru",
+                                "created_at": "2018-11-14 07:49:22",
+                                "gro_shop_info_id": 1,
+                                "location": "kfjdkl",
+                                "name": "Beeru",
+                                "rating": 4,
+                                "state": "Bihar",
+                                
+                                "user_id": 1
+                            },  // id of current selected shop  
             userID:'1', //user id   
             cartID:'0', //cart id   
             shopID:'1', //shopID
-            process:false,  
+            islogin:false,  
             refreshing:false,
             isEmpty:"Wait List is Loading.....", //message to show while loading 
             cartItem:0, //No. of item in cart    
@@ -42,7 +55,7 @@ export default class CartDetails extends React.Component{
     componentDidMount(){
        this._inslization();
        this.fetechShopList();
-       this.fetchPrice();
+       
     }
 
     /** Shop List  */
@@ -85,7 +98,8 @@ export default class CartDetails extends React.Component{
            return; 
    
         }
-       
+      
+        console.log("Pass value for price ",this.state.GrocerySelectedProduct)
         
         await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/product/price', {
             method: 'POST',
@@ -102,11 +116,12 @@ export default class CartDetails extends React.Component{
                 
                 console.log("PriceList Load......",responseJson);
               this.setState({avilableItem:responseJson.data});
+              this.setState({priceTopay:responseJson.price})
            
             }).catch((error) => {
                     
                 //  alert("updated slow network");
-                console.log( error.message);
+                console.log("Erro during Price fetech", error.message);
                 // log.error({error:err})
                 //   value.flag=false;
                 //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
@@ -115,6 +130,8 @@ export default class CartDetails extends React.Component{
 
     }
 
+
+/** 
       // It will add the list to the cart with item number 
     _storeDataForCart = async () => {
         try {
@@ -146,7 +163,7 @@ export default class CartDetails extends React.Component{
         console.log("Error in store data beta ",error);
         }
     }
-
+*/
         //It will refresh the 
     refresh =async()=>{
         try{
@@ -167,7 +184,7 @@ export default class CartDetails extends React.Component{
     }
 
 
-    /** It will create query for database */
+    /** It will create query for database 
     DataCreater = async () => {
 
         let fullAray=[]
@@ -182,7 +199,7 @@ export default class CartDetails extends React.Component{
         
         await this.dublicateControl(obj);
          
-          /** Preparing query*/   
+          /** Preparing query  
           let arrayData= this.state.fullData; 
      
         // if(arrayData.length == 0){
@@ -243,7 +260,7 @@ export default class CartDetails extends React.Component{
                 await this.setState({fullData:freshArray});
 
     }
-
+*/
     
 
         // 
@@ -252,13 +269,11 @@ export default class CartDetails extends React.Component{
            
             let shopID=await AsyncStorage.getItem('ShopID');
             let CartList = await AsyncStorage.getItem('CartList');
+            if(shopID == null && CartList == null)
+                return;
             CartList = JSON.parse(CartList);
            this.setState({GrocerySelectedProduct:CartList});
-            /**  this.fireForCurrentShopOffer();
-            this.DataCreater();
-            this.FireForRemaningShop();
-            this.fireForCurrentShop();
-            this.setState({isEmpty:'List is empty'})*/
+           this.fetchPrice();
            
         }catch(error){
             //error part
@@ -269,7 +284,7 @@ export default class CartDetails extends React.Component{
         }    
     }
 
-
+/** 
               //fire command for query in database for item value 
     fireForSelectShop =async () =>{
                     try{
@@ -405,7 +420,7 @@ export default class CartDetails extends React.Component{
                     return(flag);            
             }  
 
-            /** Remove item from list if required */
+            /** Remove item from list if required 
     _removeItem = async(item)=>{
 
        // console.log(" XXXXXXXXXXXXX ",item);
@@ -434,7 +449,7 @@ export default class CartDetails extends React.Component{
     }
 
     }
-        
+       */ 
     
         //Selected item list 
     _renderIteam=({item})=>{
@@ -462,7 +477,7 @@ export default class CartDetails extends React.Component{
             <View style={{padding:0,height:70}}>
                 
                  <View style={{height:70,width:80,padding:5}}>
-                    <ImageBackground style={{height:70,width:50,resizeMode: 'contain'}} source={{uri:uri}}>
+                    <ImageBackground style={{height:70,width:50}} source={{uri:uri}}>
                         <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{borderRadius:4,width:20,backgroundColor:'#ffffff',alignSelf:'flex-end',borderWidth:0.1,borderColor:'#000000'}}>
                         <TouchableHighlight onPress={()=>{CartRemoveItem(item);this._inslization()}}>
@@ -488,27 +503,48 @@ export default class CartDetails extends React.Component{
 
         //Render price details
     _renderPrice=({item})=>{
-         return(
+        /**{
+       "Quantity": 2,
+       "gro_map_id": 396,
+       "gro_price": 25,
+       "gro_product_info": "Product data change ",
+       "gro_product_list_id": 361,
+       "gro_product_name": "OBESITY",
+       "gro_product_shop_id": 62,
+       "gro_shop_info_id": 2,
+       "offer": 0,
+       "pic": "all_product_pics/patanjali/OBESITY.jpg",
+       "price": 50,
+       "quantity": 1,
+       "unit_name": "g",
+     }, */
+        //  let price =this.state.priceTopay +item.price;
+        // this.setState({priceTopay:price});
+        return(
                  
                
                <View style={ { backgroundColor:'#ffffff',borderBottomWidth:0.2,justifyContent:'space-between',flexDirection:'row'}}>
                         <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
-                        <Text style={{fontSize:15}}> {item.Pname}</Text>
+                        <Text style={{fontSize:15}}> {item.gro_product_name}</Text>
                         </View>
 
                         <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
-                        <Text style={{fontSize:15}}> {item.Quntity}</Text>
+                        <Text style={{fontSize:15}}> {item.Quantity} {item.unit_name}</Text>
                         </View>
 
                         <View style={{alignItems:'center',width:'25%',justifyContent:'space-between',padding:3,margin:5,}}>
-                        <Text style={{fontSize:15}}>{item.Price}</Text>
+                        <Text style={{fontSize:15}}><Icon name={'currency-inr'} size={15}/> {item.price}</Text>
                         </View>
 
                 </View>   
                          
         );
     }
-
+_storeSelectedShop = async(item)=>{
+   await AsyncStorage.setItem('ShopID',JSON.stringify(item.gro_shop_info_id));
+   this.setState({selectedShop:item});
+   this._inslization();
+}
         //Related shop price 
       
     _renderShop=({item})=>{
@@ -528,8 +564,9 @@ export default class CartDetails extends React.Component{
                         "user_id": 1,
                     }
          */
+        
         return(
-            <TouchableHighlight onPress={()=>{AsyncStorage.setItem('ShopID',item.shop_info_id);this._inslization();}}>
+            <TouchableHighlight onPress={()=>{this._storeSelectedShop(item);}}>
             <View style={{padding:5,backgroundColor:"#ffffff"}}>
                                         <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
                                         <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >{item.address}</Text>
@@ -547,57 +584,66 @@ export default class CartDetails extends React.Component{
     } 
 
     //done thish will place order
-    DoneButton= async()=>{
+    _DoneButton= async()=>{
 
         this.setState({process:true});
     
-    let userID = await AsyncStorage.getItem('costID');
-    
-    let shopID = this.state.selectedShopID;
-    let cinsert = "INSERT INTO `cart_lot_table`(customer_info_id,offer_amt,paid_amt,total_price,shop_info_id) VALUES ("+userID+',0,0,'+this.state.priceTopay+','+shopID+');';
-        // if(!this.fireInsert(cinsert)){
-        //     return;
-        // }
-        if(!await this.fireInsert(cinsert)){
+    let Token = await AsyncStorage.getItem('Token');
+    let UserID = await AsyncStorage.getItem('UserID');
+    let app = await AsyncStorage.getItem('auth');
+
+    if(Token == null && UserID == null ){
+       this.setState({islogin:true});
+    }
+    let app1 = JSON.parse(app);
+   // app1.navigate('Auth');
+  //  console.log(app1);
+    this.setState({process:false});
+//     let shopID = this.state.selectedShopID;
+//     let cinsert = "INSERT INTO `cart_lot_table`(customer_info_id,offer_amt,paid_amt,total_price,shop_info_id) VALUES ("+userID+',0,0,'+this.state.priceTopay+','+shopID+');';
+//         // if(!this.fireInsert(cinsert)){
+//         //     return;
+//         // }
+//         if(!await this.fireInsert(cinsert)){
             
-            alert("Order fail check internet connection and retry");
-            this.setState({process:false})
-             return;
-         }
-     await this.firecartID('SELECT MAX(cart_lot_no) as m from cart_lot_table where `customer_info_id`='+userID);
-      let cartID =this.state.cartID;
-      let fullQuery ='';
+//             alert("Order fail check internet connection and retry");
+//             this.setState({process:false})
+//              return;
+//          }
+//      await this.firecartID('SELECT MAX(cart_lot_no) as m from cart_lot_table where `customer_info_id`='+userID);
+//       let cartID =this.state.cartID;
+//       let fullQuery ='';
 
       
 
-   //   console.log("Cart Id",this.state.avilableItem);
-     await this.state.avilableItem.forEach(function(element){
-       //  console.log(element,element.productID);
-          let q1= " INSERT INTO `order_table`(`custumber_id`, `product_list_id`, `cart_lot_no_id`,`order_status`,`quantity`,oPrice) VALUES( "
-        let q2 = userID+","+element.productID+","+cartID+",0,"+element.Quntity+","+element.Price+" ); ";
-        fullQuery = fullQuery + q1+q2;
-        });
+//    //   console.log("Cart Id",this.state.avilableItem);
+//      await this.state.avilableItem.forEach(function(element){
+//        //  console.log(element,element.productID);
+//           let q1= " INSERT INTO `order_table`(`custumber_id`, `product_list_id`, `cart_lot_no_id`,`order_status`,`quantity`,oPrice) VALUES( "
+//         let q2 = userID+","+element.productID+","+cartID+",0,"+element.Quntity+","+element.Price+" ); ";
+//         fullQuery = fullQuery + q1+q2;
+//         });
 
-       //console.log("Full query :"+fullQuery);
+//        //console.log("Full query :"+fullQuery);
     
-    if(!await this.fireInsert(fullQuery)){
-        alert("Order fail check internet connection and retry");
-        this.setState({process:false})
-         return;
-     }
-     else{
-        alert("Your order successfully sent to the shopkeeper collect it ……");
-        await AsyncStorage.setItem('ItemInCart', '0');
-        await AsyncStorage.setItem('List',"");
+//     if(!await this.fireInsert(fullQuery)){
+//         alert("Order fail check internet connection and retry");
+//         this.setState({process:false})
+//          return;
+//      }
+//      else{
+//         alert("Your order successfully sent to the shopkeeper collect it ……");
+//         await AsyncStorage.setItem('ItemInCart', '0');
+//         await AsyncStorage.setItem('List',"");
        
-        this.refresh();
-        this.setState({process:false}); 
-        this.sendNotifactionTome("New Order","New order of total price : "+this.state.priceTopay +" From customer.",this.state.datashop[0].noti_token);
-        this.setState({avilableItem:[],priceTopay:'0',sumvalue:'0'});
+//         this.refresh();
+//         this.setState({process:false}); 
+//         this.sendNotifactionTome("New Order","New order of total price : "+this.state.priceTopay +" From customer.",this.state.datashop[0].noti_token);
+//         this.setState({avilableItem:[],priceTopay:'0',sumvalue:'0'});
+//     }
     }
-    }
-
-    //it will calculate the price of avilable product
+/** 
+   /** //it will calculate the price of avilable product
     calculate = async()=>{
            // console.log("In calculate");
             let price = 0;
@@ -631,9 +677,12 @@ export default class CartDetails extends React.Component{
              let priceTopay = (price - ((this.state.offerAmt/100) * price)).toFixed(0);
              this.setState({avilableItem:avilableArray,sumvalue:price,priceTopay:priceTopay});
            //  console.log("/////--------------",this.state.avilableItem);
-        }
+        }*/
 
     render(){
+       if(this.state.islogin)
+            return <Login/>
+        else       
        
       return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
                   
@@ -652,15 +701,15 @@ export default class CartDetails extends React.Component{
                         </View> 
                         </View> 
                           <View style={{flex:1}}>
-                                        {/* <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{this.state.datashop !=null? this.state.datashop[0].name:"There is no data" }</Text>
-                                        <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Address : {this.state.datashop !=null? this.state.datashop[0].address:"There is no data" }</Text>
-                                        <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Mobile No. :{this.state.datashop !=null? this.state.datashop[0].phone_no:"There is no data" }</Text> */}
+                                        <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{this.state.selectedShop.name }</Text>
+                                        <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Address : {this.state.selectedShop.address }</Text>
+                                      {/**  <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Mobile No. :{this.state.datashop !=null? this.state.datashop[0].phone_no:"There is no data" }</Text> */}
                                         
                                         <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
-                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*3.5</Text>
+                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{this.state.selectedShop.rating}</Text>
                                     <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : 908,56</Text>
                                     
-                                        </View> 
+                            </View> 
                            
                         </View>   
                                                      
@@ -822,7 +871,7 @@ export default class CartDetails extends React.Component{
                
             </ScrollView>
            <View style={{flexDirection:'row',justifyContent:'space-around',backgroundColor:'#f7c927'}}>
-           {!this.state.process ?  <Button title="Done" color="#f7c927" onPress={()=>{this.DoneButton()}}/> : <ActivityIndicator size="large" color="#0000ff" />}
+           {!this.state.process ?  <Button title="Done" color="#f7c927" onPress={()=>{this._DoneButton()}}/> : <ActivityIndicator size="large" color="#0000ff" />}
 
             <Button title="Refresh" onPress={()=>{this._inslization() }}/>
                

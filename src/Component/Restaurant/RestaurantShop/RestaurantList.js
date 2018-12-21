@@ -12,14 +12,13 @@ import {
             FlatList,
             ScrollView
         } from 'react-native';
-import Connection from '../../Global/Connection/Connection';
 import { SearchBar } from 'react-native-elements'
 import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
 
 
-const sql="SELECT * from shop_info_table";
 
-export default class ShopList extends React.Component{
+
+export default class RestaurantList extends React.Component{
     constructor(props){
         super(props);
         this.state={
@@ -35,14 +34,14 @@ export default class ShopList extends React.Component{
     
     componentDidMount(){
        
-        this.fetech();
+        this.fetch();
     }
 
-    fetech = async() =>{
+    fetch = async() =>{
 
        
         
-        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/List', {
+        await  fetch('http://gomarket.ourgts.com/public/api/Restaurant/Shop/List', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -67,20 +66,12 @@ export default class ShopList extends React.Component{
 
     }
 
-    _inslized=async()=>{ 
-
-       let value = await this.conn.Query(sql)
-        if(value.flag){
-            this.setState({data:value.data,fullData:value.data});  
-            console.log(this.state.data);  
-        }
-    }
 
     _storeData=async(sID) =>{
         try{
          
-            await AsyncStorage.setItem('ShopID',JSON.stringify(sID))
-            this.state.obj.navigate('Category');
+            await AsyncStorage.setItem('ResShopID',JSON.stringify(sID))
+           // this.state.obj.navigate('Category');
         }
         catch(error){
             console.log("Eroor he Product list me ",error);
@@ -89,7 +80,18 @@ export default class ShopList extends React.Component{
 
 
     _renderIteam=({item})=>{
-                
+        console.log("Resturent Load : ",item);  
+        /**{
+         "address": "",
+         "created_date": "2018-12-20 11:54:19",
+         "location": "",
+         "name": "Veeru",
+         "pic": "",
+         "points": "",
+         "res_info_id": 2,
+         "updated_date": "0000-00-00 00:00:00",
+         "user_id": 66,
+       } */      
         let uri;
         try {
           item.pic == null ||item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=item.pic;  
@@ -103,20 +105,20 @@ export default class ShopList extends React.Component{
                 <Left>
                 <Thumbnail large source={{uri: uri}} />
                 </Left>
-                  <Body style={{backgroundColor:"#f9f9f9"}}>
-                  <TouchableOpacity onPress={()=>{this._storeData(item.gro_shop_info_id);}}>
+                   <Body style={{backgroundColor:"#f9f9f9"}}>
+                  <TouchableOpacity onPress={()=>{this._storeData(item.res_info_id);}}>
                     <View>
                         <Text>{item.name}</Text>
                         <Text note>Address : {item.address}</Text>
                     </View>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         
-                        {/* <View>
-                        <Text note>Ratting : {item.address}</Text>
-                        </View> */}
+                         <View>
+                        <Text note>Ratting : {Math.floor((Math.random() * 10000) + 1)}</Text>
+                        </View> 
                     </View>
                     </TouchableOpacity>
-                  </Body>
+                  </Body> 
                   <Right>
                       <View style={{backgroundColor:"#09c416",padding:10, justifyContent:'center'}}>
                        <Text style={{fontWeight:"900",color:'#ffffff'}}>{item.rating} *</Text> 
@@ -173,7 +175,7 @@ export default class ShopList extends React.Component{
                          <FlatList
                             data={this.state.data}
                             renderItem={this._renderIteam}
-                            keyExtractor={item => item.gro_shop_info_id.toString()}
+                            keyExtractor={item => item.res_info_id.toString()}
                             ListEmptyComponent={()=>{return(<View style={{justifyContent:'center'}}>
                             <ActivityIndicator size="large" color="#0000ff" />
                             <Text>Wait List is Loading.....</Text>
