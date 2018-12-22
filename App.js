@@ -16,7 +16,7 @@ class SignInScreen extends React.Component {
     title: 'Please sign in',
   };
  
-
+  
   render() {
     return (
       <Login obj={this.props.navigation}/>
@@ -96,17 +96,22 @@ class AuthLoadingScreen extends React.Component {
       console.log("Error in app,js store ",error);
     }
   }
-
+  async componentWillMount() {
+    await Expo.Font.loadAsync({
+      'Roboto': require('native-base/Fonts/Roboto.ttf'),
+      'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
+    });
+  }
 
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
-     //await AsyncStorage.setItem('key_login_status_market_g','false');
-    const userToken = await AsyncStorage.getItem('key_login_status_market_g');
-    await AsyncStorage.setItem('auth',JSON.stringify(this.props.navigation));
-    // This will switch to the App screen or Auth screen and this loading
-    // screen will be unmounted and thrown away.
-   // this.props.navigation.navigate(userToken=='true' ? 'App' :'Auth');
- this.props.navigation.navigate('App');
+      //await AsyncStorage.setItem('key_login_status_market_g','false');
+      const userToken = await AsyncStorage.getItem('key_login_status_market_g');
+      await AsyncStorage.setItem('auth',JSON.stringify(this.props.navigation));
+      // This will switch to the App screen or Auth screen and this loading
+      // screen will be unmounted and thrown away.
+    // this.props.navigation.navigate(userToken=='true' ? 'App' :'Auth');
+  this.props.navigation.navigate('App');
   };
 
   // Render any loading content that you like here
@@ -132,6 +137,7 @@ const AppStack = createStackNavigator({ Home: HomeScreen, Other: OtherScreen });
 const AuthStack = createStackNavigator({ SignIn: SignInScreen });
 
 export default createSwitchNavigator(
+  
   {
     AuthLoading: AuthLoadingScreen,
     App: DrawerMenu,
