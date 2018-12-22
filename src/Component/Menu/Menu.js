@@ -20,6 +20,7 @@ import MyProfile from '../CommanComp/MyProfile';
 import Home from './Home';
 import CartDetails from '../Cart/Cart';
 import { RestaurantTab } from '../Restaurant/RestaurantTab';
+import { ServiceTab } from '../Service/ServiceTab';
 
 
 class MyHomeScreen extends React.Component {
@@ -194,20 +195,22 @@ class MyCartScreen extends React.Component {
   }
 
 }
-class AboutScreen extends React.Component {
+class MyServiceScreen extends React.Component {
     static navigationOptions = {
-      drawerLabel: 'About',
+      drawerLabel: 'Service',
       drawerIcon: ({ tintColor }) => (
-        <Icon name="alert-circle-outline" size={20} color={tintColor}/>
+        <Icon name="toolbox" size={20} color={tintColor}/>
       ),
     };
   
     render() {
       return (
-        <Button
-          onPress={() => this.props.navigation.goBack()}
-          title="Go back home"
-        />
+          <View style={{height:'100%'}}>
+            <LogoTitle obj={this.props.navigation} />
+             <ServiceTab/>
+              
+          </View>
+        
       );
     }
   }
@@ -257,10 +260,9 @@ class AboutScreen extends React.Component {
     MyOrder: {
         screen: MyOrderScreen,
       },
-   
-    // About: {
-    //     screen: AboutScreen,
-    //   },
+    Service: {
+        screen:MyServiceScreen,
+      },
     // Help:{
     //     screen:HelpScreen
     // },
