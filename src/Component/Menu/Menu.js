@@ -202,7 +202,7 @@ class MyCartScreen extends React.Component {
   static navigationOptions = {
     drawerLabel: 'Login',
     drawerIcon: ({ tintColor }) => (
-      <Icon name="Login" size={20} color={tintColor} />
+      <Icon name="login" size={20} color={tintColor} />
     ),
   };
 
@@ -239,7 +239,7 @@ class MyServiceScreen extends React.Component {
     }
   }
   
-  const CustomDrawerContentComponent = (props) => (
+const CustomDrawerContentComponent = (props) => (
     <ScrollView>
       
       <View style={{backgroundColor:'#660062',height:80}}>
@@ -287,19 +287,22 @@ class MyServiceScreen extends React.Component {
     Service: {
         screen:MyServiceScreen,
       },
-    // Help:{
-    //     screen:HelpScreen
-    // },
-    // Setting:{
-    //     screen:SettingScreen
-    // }
     MyCart:{
         screen:MyCartScreen,
     },
     Login:{
       screen:MyLoginScreen,
-  },
+    },
   },{
     initialRouteName:'Home',
     contentComponent:CustomDrawerContentComponent
   });
+
+  /** 
+   // Help:{
+    //     screen:HelpScreen
+    // },
+    // Setting:{
+    //     screen:SettingScreen
+    // }
+    */

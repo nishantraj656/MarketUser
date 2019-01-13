@@ -68,7 +68,7 @@ export default class ShopSubCategory extends React.Component
                 
               // console.log(responseJson);
               console.log("Subcategory Load....")
-               this.setState({data:responseJson.data.data}) 
+               this.setState({data:responseJson.data.data,isEmpty:"List is empty..."}); 
             //  console.log("On shop  value :", value);
             }).catch((error) => {
                   

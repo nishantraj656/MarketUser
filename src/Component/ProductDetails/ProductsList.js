@@ -89,7 +89,8 @@ export default class ProductsList extends React.Component
             .then((responseJson) => {
               
             console.log("Product List Load.....",responseJson);
-             this.setState({data:responseJson.data.data,fullData:responseJson.data.data}) 
+        this.setState({data:responseJson.data.data,isEmpty:"List is empty...",fullData:responseJson.data.data});
+            //  this.setState({isEmpty:"List is empty..."}); 
           //  console.log("On shop  value :", value);
           }).catch((error) => {
                 
