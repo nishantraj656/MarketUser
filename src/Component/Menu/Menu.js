@@ -21,6 +21,7 @@ import Home from './Home';
 import CartDetails from '../Cart/Cart';
 import { RestaurantTab } from '../Restaurant/RestaurantTab';
 import { ServiceTab } from '../Service/ServiceTab';
+import Login from '../Login';
 
 
 class MyHomeScreen extends React.Component {
@@ -187,7 +188,7 @@ class MyCartScreen extends React.Component {
     return (
         <View style={{height:'100%'}}>
           <LogoTitle obj={this.props.navigation} />
-           <CartDetails/>
+           <CartDetails obj={this.props.navigation} />
             
         </View>
       
@@ -195,6 +196,29 @@ class MyCartScreen extends React.Component {
   }
 
 }
+
+ /** My Login operation */
+ class MyLoginScreen extends React.Component {
+  static navigationOptions = {
+    drawerLabel: 'Login',
+    drawerIcon: ({ tintColor }) => (
+      <Icon name="Login" size={20} color={tintColor} />
+    ),
+  };
+
+  render() {
+    return (
+        <View style={{height:'100%'}}>
+          <LogoTitle obj={this.props.navigation} />
+           <Login obj={this.props.navigation}/>
+            
+        </View>
+      
+    );
+  }
+
+}
+
 class MyServiceScreen extends React.Component {
     static navigationOptions = {
       drawerLabel: 'Service',
@@ -272,6 +296,9 @@ class MyServiceScreen extends React.Component {
     MyCart:{
         screen:MyCartScreen,
     },
+    Login:{
+      screen:MyLoginScreen,
+  },
   },{
     initialRouteName:'Home',
     contentComponent:CustomDrawerContentComponent
