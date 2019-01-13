@@ -74,6 +74,7 @@ export default class Login extends Component {
             forgot_sendOTPButtonDisable:false,
             askOTP:false,
 
+            obj:this.props.obj,
         }
     }
 
@@ -235,7 +236,7 @@ export default class Login extends Component {
 
         await AsyncStorage.setItem('userProfileData', profileData);
         console.log("sending to home");
-        this.props.navigation.navigate('Home');
+        this.state.obj.navigate('MyCart');
         console.log("seneing to app");
     };
     saveNotificationToken = () => {
@@ -355,7 +356,7 @@ export default class Login extends Component {
                 if(responseJson.reg_done == 'yes'){
                    /** */
                     console.log("now calling to signin and sending to home");
-                 //   this._signInAsync(itemsToSet,JSON.stringify(profileData),userID);
+                  this._signInAsync(itemsToSet,JSON.stringify(profileData),userID);
                     this.setState({reg_submitButtonDisable:false});
                    AsyncStorage.setItem("UserID",userID);
                     AsyncStorage.setItem("Token",token);

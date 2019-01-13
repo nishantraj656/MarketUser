@@ -43,6 +43,7 @@ export default class CartDetails extends React.Component{
             cartItem:0, //No. of item in cart    
             offerAmt:10,
             priceTopay:0,
+            obj:this.props.obj, 
             imgPath:'http://gomarket.ourgts.com/public/',
             GrocerySelectedProduct:[], //Selected Grocery Product
             GroceryShop:[] //Selected Grocery Product
@@ -597,7 +598,7 @@ _storeSelectedShop = async(item)=>{
     }
     let app1 = JSON.parse(app);
    // app1.navigate('Auth');
-  //  console.log(app1);
+    console.log(app1);
     this.setState({process:false});
 //     let shopID = this.state.selectedShopID;
 //     let cinsert = "INSERT INTO `cart_lot_table`(customer_info_id,offer_amt,paid_amt,total_price,shop_info_id) VALUES ("+userID+',0,0,'+this.state.priceTopay+','+shopID+');';
@@ -680,8 +681,13 @@ _storeSelectedShop = async(item)=>{
         }*/
 
     render(){
-       if(this.state.islogin)
-            return <Login/>
+       if(this.state.islogin){
+
+      return  this.state.obj.navigate('Login');
+        // console.log("This book : ",this.state.obj);
+
+       }
+           
         else       
        
       return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
