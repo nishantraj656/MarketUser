@@ -20,6 +20,7 @@ import { } from 'react-native-elements'
 
 //import Global from '../../constants/Global';
 const {height,width} = Dimensions.get('window');
+const API_URL = "http://gomarket.ourgts.com/public/api/";
 export default class Login extends Component {
     constructor(props){
         super(props);
@@ -174,7 +175,7 @@ export default class Login extends Component {
             var username = this.state.email_or_phone.toLowerCase();
             var password = this.state.password;
             console.log(username+":"+password);
-            fetch(Global.API_URL+'login_S', {
+            fetch(API_URL+'login_MU', {
                 method: 'POST',
                 headers: {
                     
@@ -182,7 +183,7 @@ export default class Login extends Component {
                 body: JSON.stringify({
                     email:username,
                     password:password,
-                    user_type:'worker',
+                    user_type:'user',
                     noti_token:Date()+"",
                 })
             }).then((response) => response.json())
@@ -227,7 +228,7 @@ export default class Login extends Component {
     _signInAsync = async (token,profileData,userID) => {
         userID = userID + "";//converting to string
         console.log("setting token");
-        await AsyncStorage.setItem('userToken_S', token);
+        await AsyncStorage.setItem('userToken_MU', token);
         console.log("setting user data");
         await AsyncStorage.setItem('userID', userID);
 
@@ -300,7 +301,7 @@ export default class Login extends Component {
             var c_password = this.state.reg_confirm;
             var phone = this.state.reg_phone;
             console.log(name,":",email,":",password,":",c_password,":",phone);
-            fetch(Global.API_URL+'register_S', {
+            fetch(API_URL+'register_MU', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -311,7 +312,11 @@ export default class Login extends Component {
                     'password':password,
                     'c_password':c_password,
                     'phone':phone,
+<<<<<<< HEAD
                     'user_type':'customer',
+=======
+                    'user_type':'user',
+>>>>>>> 78ab949945860ef4c742d87c463c977c9eb4356b
                      noti_token:Date()+"",
 
                 })
@@ -456,7 +461,7 @@ export default class Login extends Component {
                 );        
             }else{
                 console.log("yes internet ");
-                fetch(Global.API_URL+'AvilEmail', {
+                fetch(API_URL+'AvilEmail_MU', {
                     method: 'POST',
                     headers: {},
                     body: JSON.stringify({
@@ -501,7 +506,7 @@ export default class Login extends Component {
                 );        
             }else{
                 console.log("yes internet ");
-                fetch(Global.API_URL+'AvilPhone', {
+                fetch(API_URL+'AvilPhone_MU', {
                     method: 'POST',
                     headers: {},
                     body: JSON.stringify({
@@ -602,7 +607,7 @@ export default class Login extends Component {
                 var c_password = this.state.reg_confirm;
                 var phone = this.state.reg_phone;
                 console.log(name,":",email,":",password,":",c_password,":",phone);
-                fetch(Global.API_URL+'send_OTP_S', {
+                fetch(API_URL+'send_OTP_MU', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -610,7 +615,7 @@ export default class Login extends Component {
                     body: JSON.stringify({
                         'email':email,
                         'OTP':this.state.OTPreal,
-                        'user_type':'worker',
+                        'user_type':'user',
                         noti_token:Date()+"",
     
                     })
@@ -693,7 +698,7 @@ export default class Login extends Component {
                 );        
             }else{
                 console.log("yes internet ");
-                fetch(Global.API_URL+'AvilEmail', {
+                fetch(API_URL+'AvilEmail_MU', {
                     method: 'POST',
                     headers: {},
                     body: JSON.stringify({
@@ -779,7 +784,7 @@ export default class Login extends Component {
                 var c_password = this.state.reg_confirm;
                 var phone = this.state.reg_phone;
                 console.log(name,":",email,":",password,":",c_password,":",phone);
-                fetch(Global.API_URL+'change_password_S', {
+                fetch(API_URL+'change_password_MU', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -788,7 +793,7 @@ export default class Login extends Component {
                         'email':email,
                         'password':password,
                         'c_password':c_password,
-                        'user_type':'worker',
+                        'user_type':'user',
                         noti_token:Date()+"",
     
                     })
@@ -846,7 +851,7 @@ export default class Login extends Component {
                             </View>
                             <View style={{alignSelf:'center',top:height*(0.07)}}>
                                 <Button rounded bordered info style={{alignSelf:'center',margin:5,paddingHorizontal:20}} onPress={()=>{this._openLoginModel()}}>
-                                    <Text>Login</Text>
+                                    <Text>Sign In</Text>
                                 </Button>
                                 <Button rounded bordered light style={{alignSelf:'center',margin:5,paddingHorizontal:15}} onPress={()=>{this._openSignUpModel()}}>
                                     <Text>Sign Up</Text>
