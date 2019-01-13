@@ -96,7 +96,7 @@ _addCheckbox() {
         
             element
         );
-    
+    this.state.checkboxes;
         this.setState({
             checkboxes
         });

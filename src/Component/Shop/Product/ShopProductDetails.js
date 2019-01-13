@@ -15,7 +15,7 @@ import {
         } from 'react-native';
 import { PricingCard, Rating } from 'react-native-elements';
 import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
-
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import { CartPrepare } from '../../Cart/ListPrepare';

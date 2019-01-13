@@ -194,7 +194,7 @@ export default class Login extends Component {
                         alert("Invalid Email or password");
                         return;
                     }
-                    alert("Internal Server error 5004");
+                    alert("Internal Server error 504");
                     
                     this.setState({submitButtonDisable:false});
                     return;
@@ -311,7 +311,7 @@ export default class Login extends Component {
                     'password':password,
                     'c_password':c_password,
                     'phone':phone,
-                    'user_type':'worker',
+                    'user_type':'customer',
                      noti_token:Date()+"",
 
                 })
