@@ -312,11 +312,7 @@ export default class Login extends Component {
                     'password':password,
                     'c_password':c_password,
                     'phone':phone,
-<<<<<<< HEAD
-                    'user_type':'customer',
-=======
                     'user_type':'user',
->>>>>>> 78ab949945860ef4c742d87c463c977c9eb4356b
                      noti_token:Date()+"",
 
                 })
