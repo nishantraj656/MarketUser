@@ -188,7 +188,7 @@ class MyCartScreen extends React.Component {
     return (
         <View style={{height:'100%'}}>
           <LogoTitle obj={this.props.navigation} />
-           <CartDetails obj={this.props.navigation} />
+          <CartDetails obj={this.props.navigation} />
             
         </View>
       

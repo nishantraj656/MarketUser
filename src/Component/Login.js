@@ -337,7 +337,7 @@ export default class Login extends Component {
                     'password':password,
                     'c_password':c_password,
                     'phone':phone,
-                    'user_type':'customer',
+                    'user_type':'user',
                      noti_token:token,
 
                 })
@@ -353,6 +353,7 @@ export default class Login extends Component {
                 var itemsToSet = responseJson.success.token; 
                 var token = responseJson.token;
                 var userID = responseJson.userID;
+                var profileData = responseJson.profileData;
                 if(responseJson.reg_done == 'yes'){
                    /** */
                     console.log("now calling to signin and sending to home");
