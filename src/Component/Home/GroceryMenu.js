@@ -54,7 +54,7 @@ export const Grocery = createBottomTabNavigator(
     {
         Home:ModalNavigator,
         Shopping: ModalNavigatorShop,
-      Cart: CartDetails,
+        Cart: CartDetails,
     //  Profile:ProfileScreen,
     //  "Order History":HistoryScreen,
       

@@ -242,7 +242,7 @@ class MyServiceScreen extends React.Component {
       width: 24,
       height: 24,
     },
-  });
+  }); 
   
  export const DrawerMenu = createDrawerNavigator({
     Home: {
