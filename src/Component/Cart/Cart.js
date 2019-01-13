@@ -75,7 +75,7 @@ export default class CartDetails extends React.Component{
                 .then((responseJson) => {
                 
                // console.log("Shop List Load ......",responseJson);
-              this.setState({GroceryShop:responseJson.data.data}); 
+              this.setState({GroceryShop:responseJson.data.data,isEmpty:"List is empty..."}); 
             //  console.log("On shop  value :", value);
             }).catch((error) => {
                     
@@ -116,8 +116,9 @@ export default class CartDetails extends React.Component{
                 .then((responseJson) => {
                 
                 console.log("PriceList Load......",responseJson);
-              this.setState({avilableItem:responseJson.data});
+              this.setState({avilableItem:responseJson.data,isEmpty:"List is empty..."});
               this.setState({priceTopay:responseJson.price})
+              
            
             }).catch((error) => {
                     
@@ -456,7 +457,7 @@ export default class CartDetails extends React.Component{
     _renderIteam=({item})=>{
        // console.log(item);
        /** Output is
-        * Object {
+        *       {
                     "Quantity": 3,
                     "gro_map_id": 56,
                     "gro_price": 100,
@@ -504,21 +505,23 @@ export default class CartDetails extends React.Component{
 
         //Render price details
     _renderPrice=({item})=>{
-        /**{
-       "Quantity": 2,
-       "gro_map_id": 396,
-       "gro_price": 25,
-       "gro_product_info": "Product data change ",
-       "gro_product_list_id": 361,
-       "gro_product_name": "OBESITY",
-       "gro_product_shop_id": 62,
-       "gro_shop_info_id": 2,
-       "offer": 0,
-       "pic": "all_product_pics/patanjali/OBESITY.jpg",
-       "price": 50,
-       "quantity": 1,
-       "unit_name": "g",
-     }, */
+        /**
+                {
+                "Quantity": 2,
+                "gro_map_id": 396,
+                "gro_price": 25,
+                "gro_product_info": "Product data change ",
+                "gro_product_list_id": 361,
+                "gro_product_name": "OBESITY",
+                "gro_product_shop_id": 62,
+                "gro_shop_info_id": 2,
+                "offer": 0,
+                "pic": "all_product_pics/patanjali/OBESITY.jpg",
+                "price": 50,
+                "quantity": 1,
+                "unit_name": "g",
+                }
+      */
         //  let price =this.state.priceTopay +item.price;
         // this.setState({priceTopay:price});
         return(
@@ -550,20 +553,19 @@ _storeSelectedShop = async(item)=>{
       
     _renderShop=({item})=>{
                 
-        // console.log(item);
         /**
-         *  Object {
-                        "address": "ABCD",
-                        "city": "Beeru",
-                        "created_at": "2018-11-14 07:49:22",
-                        "gro_shop_info_id": 1,
-                        "location": "kfjdkl",
-                        "name": "Beeru",
-                        "rating": 4,
-                        "state": "Bihar",
-                        "updated_at": null,
-                        "user_id": 1,
-                    }
+            {
+                "address": "ABCD",
+                "city": "Beeru",
+                "created_at": "2018-11-14 07:49:22",
+                "gro_shop_info_id": 1,
+                "location": "kfjdkl",
+                "name": "Beeru",
+                "rating": 4,
+                "state": "Bihar",
+                "updated_at": null,
+                "user_id": 1,
+            }
          */
         
         return(
@@ -578,8 +580,7 @@ _storeSelectedShop = async(item)=>{
                                         </View> 
                           <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
             </View>
-            </TouchableHighlight>        
-                        
+            </TouchableHighlight>                               
         );
         
     } 
@@ -596,55 +597,53 @@ _storeSelectedShop = async(item)=>{
     if(Token == null && UserID == null ){
        this.setState({islogin:true});
     }
-    let app1 = JSON.parse(app);
-   // app1.navigate('Auth');
-    console.log(app1);
+   
     this.setState({process:false});
-//     let shopID = this.state.selectedShopID;
-//     let cinsert = "INSERT INTO `cart_lot_table`(customer_info_id,offer_amt,paid_amt,total_price,shop_info_id) VALUES ("+userID+',0,0,'+this.state.priceTopay+','+shopID+');';
-//         // if(!this.fireInsert(cinsert)){
-//         //     return;
-//         // }
-//         if(!await this.fireInsert(cinsert)){
-            
-//             alert("Order fail check internet connection and retry");
-//             this.setState({process:false})
-//              return;
-//          }
-//      await this.firecartID('SELECT MAX(cart_lot_no) as m from cart_lot_table where `customer_info_id`='+userID);
-//       let cartID =this.state.cartID;
-//       let fullQuery ='';
-
+    console.log(" List Prepare : ",this.state.avilableItem);
       
+                  /**       let shopID = this.state.selectedShopID;
+                        let cinsert = "INSERT INTO `cart_lot_table`(customer_info_id,offer_amt,paid_amt,total_price,shop_info_id) VALUES ("+userID+',0,0,'+this.state.priceTopay+','+shopID+');';
+                            // if(!this.fireInsert(cinsert)){
+                            //     return;
+                            // }
+                            if(!await this.fireInsert(cinsert)){
+                                
+                                alert("Order fail check internet connection and retry");
+                                this.setState({process:false})
+                                 return;
+                             }
+                         await this.firecartID('SELECT MAX(cart_lot_no) as m from cart_lot_table where `customer_info_id`='+userID);
+                          let cartID =this.state.cartID;
+                          let fullQuery ='';
+                       //   console.log("Cart Id",this.state.avilableItem);
+                         await this.state.avilableItem.forEach(function(element){
+                           //  console.log(element,element.productID);
+                              let q1= " INSERT INTO `order_table`(`custumber_id`, `product_list_id`, `cart_lot_no_id`,`order_status`,`quantity`,oPrice) VALUES( "
+                            let q2 = userID+","+element.productID+","+cartID+",0,"+element.Quntity+","+element.Price+" ); ";
+                            fullQuery = fullQuery + q1+q2;
+                            });
+                           //console.log("Full query :"+fullQuery);
+                        
+                        if(!await this.fireInsert(fullQuery)){
+                            alert("Order fail check internet connection and retry");
+                            this.setState({process:false})
+                             return;
+                         }
+                         else{
+                            alert("Your order successfully sent to the shopkeeper collect it ……");
+                            await AsyncStorage.setItem('ItemInCart', '0');
+                            await AsyncStorage.setItem('List',"");
+                        
+                            this.refresh();
+                            this.setState({process:false}); 
+                            this.sendNotifactionTome("New Order","New order of total price : "+this.state.priceTopay +" From customer.",this.state.datashop[0].noti_token);
+                            this.setState({avilableItem:[],priceTopay:'0',sumvalue:'0'});
+                         }*/
+   
 
-//    //   console.log("Cart Id",this.state.avilableItem);
-//      await this.state.avilableItem.forEach(function(element){
-//        //  console.log(element,element.productID);
-//           let q1= " INSERT INTO `order_table`(`custumber_id`, `product_list_id`, `cart_lot_no_id`,`order_status`,`quantity`,oPrice) VALUES( "
-//         let q2 = userID+","+element.productID+","+cartID+",0,"+element.Quntity+","+element.Price+" ); ";
-//         fullQuery = fullQuery + q1+q2;
-//         });
-
-//        //console.log("Full query :"+fullQuery);
-    
-//     if(!await this.fireInsert(fullQuery)){
-//         alert("Order fail check internet connection and retry");
-//         this.setState({process:false})
-//          return;
-//      }
-//      else{
-//         alert("Your order successfully sent to the shopkeeper collect it ……");
-//         await AsyncStorage.setItem('ItemInCart', '0');
-//         await AsyncStorage.setItem('List',"");
-       
-//         this.refresh();
-//         this.setState({process:false}); 
-//         this.sendNotifactionTome("New Order","New order of total price : "+this.state.priceTopay +" From customer.",this.state.datashop[0].noti_token);
-//         this.setState({avilableItem:[],priceTopay:'0',sumvalue:'0'});
-//     }
     }
-/** 
-   /** //it will calculate the price of avilable product
+
+   /** it will calculate the price of avilable product
     calculate = async()=>{
            // console.log("In calculate");
             let price = 0;
@@ -682,20 +681,12 @@ _storeSelectedShop = async(item)=>{
 
     render(){
        if(this.state.islogin){
-
-      return  this.state.obj.navigate('Login');
-        // console.log("This book : ",this.state.obj);
-
-       }
-           
-        else       
-       
+        return  this.state.obj.navigate('Login');        
+       }           
+    else         
       return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
                   
-                    <ScrollView
-                   
-                     
-                    >
+            <ScrollView>
                     <View style={{backgroundColor:"#f9f9f9",padding:5,justifyContent:'center'}}>
 
                         <View style={{flex:0.5,backgroundColor:"#f9f9f9",marginBottom:5,flexDirection:'row',justifyContent:'center'}}>
@@ -746,6 +737,7 @@ _storeSelectedShop = async(item)=>{
                                         </View>);
                                     else
                                     return(<View style={{justifyContent:'center'}}>
+
                                             <Text>{this.state.isEmpty}</Text>
     
                                             </View>)}}
@@ -841,13 +833,7 @@ _storeSelectedShop = async(item)=>{
 
 
          </View>
-                           
-
-
-
-
-
-                <View style={{padding:10,backgroundColor:'#071a84',marginTop:10}}>
+         <View style={{padding:10,backgroundColor:'#071a84',marginTop:10}}>
                     <Text style={{color:'#fcfcfc',fontStyle:'italic',fontSize:20,}}> Price of the same item on other shop.</Text>
 
                 </View>
@@ -885,15 +871,13 @@ _storeSelectedShop = async(item)=>{
        
        
         </View>
-          )
-        
+          )       
     }
 
-           //database connection 
+        //database connection 
   sendNotifactionTome = (title,msg,token) =>{
    
-   // console.log("Tokn :",token);
-   
+    // console.log("Tokn :",token);
     fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {

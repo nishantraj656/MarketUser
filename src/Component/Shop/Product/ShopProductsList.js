@@ -91,7 +91,7 @@ export default class ShopsProductsList extends React.Component
             .then((responseJson) => {
               
             console.log("Product List Load.....");
-             this.setState({data:responseJson.data.data}) 
+             this.setState({data:responseJson.data.data,isEmpty:"List is empty..."}) 
              this._addCheckbox();
           // console.log("On shop  value :", this.state.checkboxes);
           }).catch((error) => {

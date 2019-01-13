@@ -53,7 +53,7 @@ export default class ShopList extends React.Component{
                 .then((responseJson) => {
                 
                 console.log("Shop List Load ......",responseJson);
-              this.setState({data:responseJson.data.data}); 
+              this.setState({data:responseJson.data.data,isEmpty:"List is empty..."}); 
             //  console.log("On shop  value :", value);
             }).catch((error) => {
                     
