@@ -266,7 +266,7 @@ const CustomDrawerContentComponent = (props) => (
       width: 24,
       height: 24,
     },
-  });
+  }); 
   
  export const DrawerMenu = createDrawerNavigator({
     Home: {
