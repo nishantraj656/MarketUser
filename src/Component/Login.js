@@ -16,6 +16,7 @@ import {
 import { Container, Spinner, Button,Text, Item,Input,CheckBox,Body} from 'native-base';
 import {createDrawerNavigator,DrawerItems, SafeAreaView,createStackNavigator,NavigationActions } from 'react-navigation';
 import Icon  from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Permissions, Notifications } from 'expo';
 import { } from 'react-native-elements'
 
 //import Global from '../../constants/Global';
@@ -243,7 +244,7 @@ export default class Login extends Component {
     
 
     // handle regiter 
-    submitRegister = () =>{
+    submitRegister = async() =>{
         if(
             this.state.reg_name_valid_color != 'green' ||
             this.state.reg_phone_valid_color != 'green' ||
@@ -276,7 +277,30 @@ export default class Login extends Component {
             alert("Confirm password dont matched with previous one!!");
             return;
         }
-
+        /** Notifaction  */
+        const { status: existingStatus } = await Permissions.getAsync(
+            Permissions.NOTIFICATIONS
+          );
+          let finalStatus = existingStatus;
+        
+          // only ask if permissions have not already been determined, because
+          // iOS won't necessarily prompt the user a second time.
+          if (existingStatus !== 'granted') {
+            // Android remote notification permissions are granted during the app
+            // install, so this will only ask on iOS
+            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+            finalStatus = status;
+          }
+        
+          // Stop here if the user did not grant permissions
+          if (finalStatus !== 'granted') {
+            return;
+          }
+        
+          // Get the token that uniquely identifies this device
+          let token = await Notifications.getExpoPushTokenAsync();
+          console.log("Token :",token);
+          /**Noti fication code end */
 
         // now sending request to login
         var connectionInfoLocal = '';
@@ -312,12 +336,8 @@ export default class Login extends Component {
                     'password':password,
                     'c_password':c_password,
                     'phone':phone,
-<<<<<<< HEAD
                     'user_type':'customer',
-=======
-                    'user_type':'user',
->>>>>>> 78ab949945860ef4c742d87c463c977c9eb4356b
-                     noti_token:Date()+"",
+                     noti_token:token,
 
                 })
             }).then((response) => response.json())
@@ -328,13 +348,17 @@ export default class Login extends Component {
                     this.setState({reg_submitButtonDisable:false});
                     return;
                 }
+
                 var itemsToSet = responseJson.success.token; 
-                var profileData = responseJson.profileData;
+                var token = responseJson.token;
                 var userID = responseJson.userID;
                 if(responseJson.reg_done == 'yes'){
+                   /** */
                     console.log("now calling to signin and sending to home");
-                    this._signInAsync(itemsToSet,JSON.stringify(profileData),userID);
+                 //   this._signInAsync(itemsToSet,JSON.stringify(profileData),userID);
                     this.setState({reg_submitButtonDisable:false});
+                   AsyncStorage.setItem("UserID",userID);
+                    AsyncStorage.setItem("Token",token);
                     return;
                 }else{
                     alert("Invalid Email or Password");
