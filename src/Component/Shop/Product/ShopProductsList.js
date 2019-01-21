@@ -27,7 +27,7 @@ import { SearchBar } from 'react-native-elements'
 //import Search from '../../Global/Search';
 import { TextInput } from 'react-native-gesture-handler';
 import { CartPrepare } from '../../Cart/ListPrepare';
-
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 
 
@@ -91,14 +91,16 @@ export default class ShopsProductsList extends React.Component
             .then((responseJson) => {
               
             console.log("Product List Load.....");
-             this.setState({data:responseJson.data.data,isEmpty:"List is empty..."}) 
+             this.setState({data:responseJson.data.data,isEmpty:"List is empty...",loading:false}) 
              this._addCheckbox();
           // console.log("On shop  value :", this.state.checkboxes);
           }).catch((error) => {
                 
               //  alert("updated slow network");
+              this.setState({isEmpty:"Updated Slow Network",loading:false}) 
+            
              console.log( error.message);
-            // log.error({error:err})
+             log.error({error:err})
               //   value.flag=false;
               //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
   
@@ -200,15 +202,29 @@ _toggleCheckbox =(index) =>{
 _renderIteam=({item})=>{
         
   //  console.log("Product ---",item );
+  /**{
+        "checked": true,
+        "gro_cat_id": 3,
+        "gro_map_id": 2,
+        "gro_price": 85,
+        "gro_product_info": "Product data change ",
+        "gro_product_list_id": 2,
+        "gro_product_name": "Lifebuoy Nature Germ Protection Handwash",
+        "index": 0,
+        "pic": "all_product_pics/personal_care/Lifebuoy Nature Germ Protection Handwash.jpg",
+        "quantity": 750,
+        "quntity": 1,
+        "unit_name": "ML"
+    }*/
  
     
     let pName = item.gro_product_name;
     let sName = item.gro_product_name;
     let PID = item.gro_product_list_id;
     let sID = 2;
-   let unit ="KG";
-    let price =6;
-   let Qun = item.quntity;
+    let unit = item.unit_name;
+    let price = item.gro_price;
+    let Qun = item.quntity;
     let pListID =4;
     let uri;
     
@@ -240,11 +256,11 @@ _renderIteam=({item})=>{
                 <TouchableOpacity onPress={()=>{this._storeData(item)}}>
               
                  <View style={{alignItems:'center', justifyContent:'center',padding:3,flexDirection:'row'}}>
-                    <Text style={{fontSize:14,fontWeight:'300'}}>{pName}</Text>
+                    <Text style={{fontSize:14,fontWeight:'300'}}>{pName} {PID}</Text>
                 </View>
 
                 <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                <Text style={{fontSize:14,fontWeight:'900'}}>Price:{price} Rs/{unit}</Text>
+                <Text style={{fontSize:14,fontWeight:'900'}}>Price: <Icon name={'currency-inr'} size={15}/> {price} {unit}</Text>
                 </View>
             
                 <View style={{justifyContent:'space-around',flexDirection:'row'}}>

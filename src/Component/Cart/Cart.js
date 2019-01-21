@@ -11,7 +11,7 @@ const quer2=null;
 
 
 export default class CartDetails extends React.Component{
-
+    
     constructor(props){
         super(props)
         this.state={
@@ -37,7 +37,7 @@ export default class CartDetails extends React.Component{
             userID:'1', //user id   
             cartID:'0', //cart id   
             shopID:'1', //shopID
-            islogin:2,  
+            islogin:1,  
             refreshing:false,
             isEmpty:"Wait List is Loading.....", //message to show while loading 
             cartItem:0, //No. of item in cart    
@@ -48,12 +48,37 @@ export default class CartDetails extends React.Component{
             GrocerySelectedProduct:[], //Selected Grocery Product
             GroceryShop:[], //Selected Grocery Product
             groceryArrayItem:[],//selectedArray
+           token:'',
+          /** region: {
+            latitude:       LATITUDE,
+            longitude:      LONGITUDE,
+            latitudeDelta:  LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          },
+          marker: {
+            latlng:{
+              latitude:       null,
+              longitude:      null,
+              latitudeDelta:  LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA
+            }
+            } */
         }
 
     }
 
 
     componentDidMount(){
+
+        // navigator.geolocation.getCurrentPosition (
+        //     (position) => { alert("value:" + position) },
+        //     (error)    => { console.log(error) },
+        //     {
+        //       enableHighAccuracy: true,
+        //       timeout:            20000,
+        //       maximumAge:         10000
+        //     }
+        //   )
        this._inslization();
        this.fetechShopList();
        
@@ -156,12 +181,13 @@ export default class CartDetails extends React.Component{
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Authorization':'Bearer '+this.state.token,
             },
             body:JSON.stringify({
                 real_Price:this.state.priceTopay,
                 Offer_Price:this.state.offerAmt,
                 paid_amt:(this.state.priceTopay-this.state.offerAmt),
-                customerID:24,
+                customerID:this.state.userID,
                 Order_address:"at - Bhahalpur gro_shop_info_id",
                 gro_shop_ID:JSON.parse(value),
                 Item:this.state.groceryArrayItem
@@ -215,7 +241,8 @@ export default class CartDetails extends React.Component{
            
             let shopID=await AsyncStorage.getItem('ShopID');
             let CartList = await AsyncStorage.getItem('CartList');
-            if(shopID == null && CartList == null)
+    
+            if(shopID == null && CartList == null )
                 return;
             CartList = JSON.parse(CartList);
            this.setState({GrocerySelectedProduct:CartList});
@@ -374,11 +401,15 @@ _storeSelectedShop = async(item)=>{
     let UserID = await AsyncStorage.getItem('UserID');
     let app = await AsyncStorage.getItem('auth');
 
+    console.log("Token : ",Token);
+    console.log("UserID : ",UserID);
     if(Token == null && UserID == null ){
        this.setState({islogin:0});
     }
-    else
-    this.setState({islogin:1});
+    else{
+        this.setState({islogin:1,token:Token,userID:UserID});
+    }
+    
     this.setState({process:false});
    
       
@@ -436,10 +467,7 @@ _storeSelectedShop = async(item)=>{
                 <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
 
                     <View>
-                        <Text>Enter Address : </Text>
-                    </View>
-                    <View>
-                       <Text> At- Bhagalpur Bihar,India</Text>
+                       <Button onPress={()=>{alert("Location Button Click");}} title="Use my Current Location"/>
                     </View>
                
                 </View>
@@ -454,6 +482,43 @@ _storeSelectedShop = async(item)=>{
                     </View>
                
                 </View>
+
+                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
+
+                <View>
+                    <Text>House No.,Building name * : </Text>
+                </View>
+                <View>
+                    <Text>---------</Text>
+                </View>
+
+                </View>
+
+                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9",justifyContent:'space-between'}}>
+
+                <View>
+                    <Text>City : </Text>
+                    <Text>Bhagalpur</Text>
+                </View>
+                <View>
+                    <Text>State</Text>
+                    <Text>Bihar</Text>
+                </View>
+
+                </View>
+
+                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
+
+                    <View>
+                        <Text>Name : </Text>
+                    </View>
+                    <View>
+                        <Text>-------------</Text>
+                    </View>
+               
+                </View>
+
+
                 <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
 
                     <View>
@@ -466,7 +531,7 @@ _storeSelectedShop = async(item)=>{
                 </View>
 
                 <View>
-                    <Button title="Buy"  onPress={() =>{ this.prepareOrder();} } />
+                    <Button title="Save"  onPress={() =>{ this.prepareOrder();} } />
                 </View>
                 
             </ScrollView>      
@@ -623,6 +688,7 @@ _storeSelectedShop = async(item)=>{
 
 
          </View>
+
          <View style={{padding:10,backgroundColor:'#071a84',marginTop:10}}>
                     <Text style={{color:'#fcfcfc',fontStyle:'italic',fontSize:20,}}> Price of the same item on other shop.</Text>
 
@@ -663,6 +729,8 @@ _storeSelectedShop = async(item)=>{
         </View>
           )       
     }
+
+    
 
         //database connection 
   sendNotifactionTome = (title,msg,token) =>{

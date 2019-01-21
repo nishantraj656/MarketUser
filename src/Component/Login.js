@@ -230,10 +230,10 @@ export default class Login extends Component {
     _signInAsync = async (token,profileData,userID) => {
         userID = userID + "";//converting to string
         console.log("setting token");
-        await AsyncStorage.setItem('userToken_MU', token);
+        await AsyncStorage.setItem('Token', token);
         console.log("setting user data");
-        await AsyncStorage.setItem('userID', userID);
-
+        await AsyncStorage.setItem('UserID', userID);
+        console.log("Profile set :",profileData);
         await AsyncStorage.setItem('userProfileData', profileData);
         console.log("sending to home");
         this.state.obj.navigate('MyCart');
