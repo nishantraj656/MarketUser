@@ -10,6 +10,7 @@ import {
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import { DrawerMenu } from './src/Component/Menu/Menu';
 import Login from './src/Component/CommanComp/Login';
+import { ServiceTab } from './src/Component/Service/ServiceTab';
 
 class SignInScreen extends React.Component {
   static navigationOptions = {

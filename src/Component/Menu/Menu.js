@@ -261,7 +261,7 @@ class MyServiceScreen extends React.Component {
         screen: MyOrderScreen,
       },
     Service: {
-        screen:MyServiceScreen,
+        screen:ServiceTab,
       },
     // Help:{
     //     screen:HelpScreen
@@ -273,6 +273,6 @@ class MyServiceScreen extends React.Component {
         screen:MyCartScreen,
     },
   },{
-    initialRouteName:'Home',
+    initialRouteName:'Service',
     contentComponent:CustomDrawerContentComponent
   });
