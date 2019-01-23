@@ -21,9 +21,8 @@ import {
 
 
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
-import Connection from '../../Global/Connection/Connection';
 import { ProductListing } from '../Cart/ListPrepare';
-import { SearchBar } from 'react-native-elements'
+import { SearchBar } from 'react-native-elements';
 import Search from '../../Global/Search';
 import { TextInput } from 'react-native-gesture-handler';
 
@@ -51,7 +50,7 @@ export default class ProductsList extends React.Component
           checkboxes:[],
             
         }
-        this.conn=new Connection();
+      
         
     }
 
@@ -64,7 +63,7 @@ export default class ProductsList extends React.Component
     componentDidMount(){
        // console.log(this.state.sql);
        this.fetech();
-      //  this._inslized();
+      //this._inslized();
     }
 
     fetech = async() =>{
@@ -88,17 +87,14 @@ export default class ProductsList extends React.Component
         }).then((response) => response.json())
             .then((responseJson) => {
               
-            console.log("Product List Load.....",responseJson);
-             this.setState({data:responseJson.data.data,fullData:responseJson.data.data}) 
-          //  console.log("On shop  value :", value);
+            console.log("Product List Load.....");
+        this.setState({data:responseJson.data.data,isEmpty:"List is Empty...",fullData:responseJson.data.data,loading:false});
+           
           }).catch((error) => {
                 
               //  alert("updated slow network");
              console.log( error.message);
-            // log.error({error:err})
-              //   value.flag=false;
-              //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
-  
+             this.setState({isEmpty:"Updated Slow Network",loading:false});
             }); 
 
     }
@@ -185,13 +181,9 @@ export default class ProductsList extends React.Component
      
         
         let pName = item.gro_product_name;
-    //     let sName = item.sName.split(',')[0];
+  
          let PID = item.gro_product_list_id;
-    //     let sID = item.ShopID.split(',')[0];
-    //     let unit =item.unit.split(',')[0];
-    //     let price =item.price.split(',')[0];
-    //   //  let Qun = "1"
-    //     let pListID = item.p_list_id.split(',')[0];
+   
     let uri;
     try {
       item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=this.state.imgPath+item.pic;  
@@ -221,54 +213,14 @@ export default class ProductsList extends React.Component
                     <TouchableOpacity onPress={()=>{this._storeData(item)}}>
                   
                      <View style={{alignItems:'center', justifyContent:'center',padding:3,flexDirection:'row'}}>
-                        <Text style={{fontSize:20,fontWeight:'300'}}>{pName}</Text>
+                        <Text style={{fontSize:15,fontWeight:'300'}}>{pName}</Text>
                     </View>
 
                     <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <Text style={{fontSize:15,fontWeight:'900',color:'#d2d5db'}}>{item.gro_product_info}</Text>
                     </View>
                     
-                   <View>
-                   <Text style={{fontSize:12,fontWeight:'300'}}>Item Id :{PID}</Text>
-                   </View>
-
-                    {/* <View>
-                    <Text style={{fontSize:15,fontWeight:'500',color:"#720664"}}>{sName}</Text>
-                    </View>
-                    <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                    <Text style={{fontSize:15,fontWeight:'900',paddingHorizontal:7,color:'#fcfcfc',backgroundColor:'#02490b'}}>*3.5</Text>
-                    <Text style={{fontSize:15,fontWeight:'400',paddingHorizontal:7,color:'#878787',}}>Rating 1,657</Text>
-                    </View> */}
                   </TouchableOpacity>
-                   
-                    {/* <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,height:100,paddingBottom:5}}>
-                        <View style={{borderWidth:1}}>
-                            <Picker
-                                selectedValue={this.state.weight}
-                                style={{  width: 100 }}
-                                onValueChange={(itemValue, itemIndex) => this.setState({language: weight})}>
-                                <Picker.Item label="1 Kg" value="1" />
-                             </Picker>
-                        </View> 
-
-                         {item.checked ?
-                    <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,height:100,paddingBottom:5}}>
-                        <Button title=" Add Item + " onPress={this._toggleCheckbox.bind(this, item.index)}/>
-                    </View>
-                    :
-
-                        <View style={{borderWidth:1,flexDirection:'row'}}>
-                        <Button title=' - '  onPress={()=>{this.setState({Qun: this.state.Qun > 1? this.state.Qun-1 :this.state.Qun })}}/>
-                        <TouchableOpacity onPress={()=>{ProductListing(PID,sID,this.state.Qun,unit,price,pListID,uri);}}>
-                        <View style={{width:50}}><Text style={{fontSize:20,alignSelf:'center'}}>{this.state.Qun}</Text></View>
-                        </TouchableOpacity>
-                        <Button title=' + ' onPress={()=>{this.setState({Qun:this.state.Qun+1})}}/>
-                           
-
-                        </View>
-                   }
-                    </View>
-                    */}
                     </View>
                 </View>
             

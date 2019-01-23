@@ -21,6 +21,7 @@ import Home from './Home';
 import CartDetails from '../Cart/Cart';
 import { RestaurantTab } from '../Restaurant/RestaurantTab';
 import { ServiceTab } from '../Service/ServiceTab';
+import Login from '../Login';
 
 
 class MyHomeScreen extends React.Component {
@@ -65,7 +66,7 @@ class GroceryScreen extends React.Component {
     static navigationOptions = {
       drawerLabel: 'Grocery',
       drawerIcon: ({ tintColor }) => (
-        <Icon name="home" size={20} color={tintColor} />
+        <Icon name="carrot" size={20} color={tintColor} />
       ),
     };
   
@@ -73,8 +74,7 @@ class GroceryScreen extends React.Component {
       return (
           <View style={{height:'100%'}}>
             <LogoTitle obj={this.props.navigation} />
-             <Grocery/>
-              
+             <Grocery/>    
           </View>
         
       );
@@ -164,6 +164,25 @@ class MyOrderScreen extends React.Component {
         <Icon name="mailbox" size={20} color={tintColor}/>
       ),
     };
+
+    componentDidMount(){
+      
+      this.isLoginData();
+    
+    }
+
+    isLoginData = async()=>{
+      let Token = await AsyncStorage.getItem('Token');
+      let UserID = await AsyncStorage.getItem('UserID');
+     
+  
+      console.log("Token : ",Token);
+      console.log("UserID : ",UserID);
+      if(Token == null && UserID == null ){
+         this.props.navigation.navigate('Login');
+      }
+     
+    }
   
     render() {
       return (
@@ -179,7 +198,7 @@ class MyCartScreen extends React.Component {
   static navigationOptions = {
     drawerLabel: 'My Cart',
     drawerIcon: ({ tintColor }) => (
-      <Icon name="home" size={20} color={tintColor} />
+      <Icon name="cart-outline" size={20} color={tintColor} />
     ),
   };
 
@@ -187,7 +206,7 @@ class MyCartScreen extends React.Component {
     return (
         <View style={{height:'100%'}}>
           <LogoTitle obj={this.props.navigation} />
-           <CartDetails/>
+          <CartDetails obj={this.props.navigation} />
             
         </View>
       
@@ -195,11 +214,65 @@ class MyCartScreen extends React.Component {
   }
 
 }
+
+ /** My Login operation */
+ class MyLoginScreen extends React.Component {
+  constructor(props){
+      super(props);
+      this.state={
+        isLogin:false
+      }
+  }
+  componentDidMount(){
+    this._DoneButton();
+  }
+
+   //done thish will place order
+   _DoneButton= async()=>{
+   
+  
+
+let Token = await AsyncStorage.getItem('Token');
+let UserID = await AsyncStorage.getItem('UserID');
+
+
+console.log("Token : ",Token);
+console.log("UserID : ",UserID);
+if(Token == null && UserID == null ){
+   this.setState({islogin:false});
+}
+else{
+    this.setState({islogin:true});
+}
+
+  
+}
+
+  static navigationOptions = {
+    drawerLabel: this.state.isLogin? 'LogOut':'Login',
+    drawerIcon: ({ tintColor }) => (
+      <Icon name="login" size={20} color={tintColor} />
+    ),
+  };
+
+  render() {
+    return (
+        <View style={{height:'100%'}}>
+          <LogoTitle obj={this.props.navigation} />
+           <Login obj={this.props.navigation}/>
+            
+        </View>
+      
+    );
+  }
+
+}
+
 class MyServiceScreen extends React.Component {
     static navigationOptions = {
       drawerLabel: 'Service',
       drawerIcon: ({ tintColor }) => (
-        <Icon name="toolbox" size={20} color={tintColor}/>
+        <Icon name="file-percent" size={20} color={tintColor}/>
       ),
     };
   
@@ -215,7 +288,7 @@ class MyServiceScreen extends React.Component {
     }
   }
   
-  const CustomDrawerContentComponent = (props) => (
+const CustomDrawerContentComponent = (props) => (
     <ScrollView>
       
       <View style={{backgroundColor:'#660062',height:80}}>
@@ -242,7 +315,7 @@ class MyServiceScreen extends React.Component {
       width: 24,
       height: 24,
     },
-  });
+  }); 
   
  export const DrawerMenu = createDrawerNavigator({
     Home: {
@@ -263,16 +336,22 @@ class MyServiceScreen extends React.Component {
     Service: {
         screen:ServiceTab,
       },
-    // Help:{
-    //     screen:HelpScreen
-    // },
-    // Setting:{
-    //     screen:SettingScreen
-    // }
     MyCart:{
         screen:MyCartScreen,
+    },
+    Login:{
+      screen:MyLoginScreen,
     },
   },{
     initialRouteName:'Service',
     contentComponent:CustomDrawerContentComponent
   });
+
+  /** 
+   // Help:{
+    //     screen:HelpScreen
+    // },
+    // Setting:{
+    //     screen:SettingScreen
+    // }
+    */

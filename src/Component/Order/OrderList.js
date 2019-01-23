@@ -4,7 +4,6 @@ import {createStackNavigator} from 'react-navigation';
 
 
 import { ScrollView } from 'react-native-gesture-handler';
-import Connection from '../../Global/Connection/Connection';
 import Feedback from '../Feedback/Feedback';
 
 
@@ -12,7 +11,7 @@ import Feedback from '../Feedback/Feedback';
 
     //This  show List of History cart 
 class CartList extends React.Component{
-
+   
     constructor(props){
         super(props)
         this.state={
@@ -21,43 +20,78 @@ class CartList extends React.Component{
             datap:[],
             userID:0,
             process:false,
-            isEmpty:'Wait List is Loading.....'
+            isEmpty:'Wait List is Loading.....',
+            token:'',
+            price:0
         } 
-        this.conn = new Connection(); 
+      
     }
 
-    componentWillMount(){
-        console.log("It will calll mount ");
+    componentDidMount(){
+        console.log("It will call DidMount ");
         this._retrieveData();
+        price =0;
      }
 
     _retrieveData = async () => {
         try {
-          const value = await AsyncStorage.getItem('categoryID');
-          const userID = await AsyncStorage.getItem('costID');
-          if (value !== null && userID !== null) {
-            // We have data!!
-            console.log("In value return  data "+value);
-           this.setState({userID:userID});
-            this.fire();
-           
-          }
-          else{
-              console.log("Else wale ho beta ");
-          }
+          let token = await AsyncStorage.getItem('Token');
+          let userID = await AsyncStorage.getItem('UserID');
+            if ( userID == null && token == null) {
+
+                // We have data!!         
+                console.log("We have not any data ");
+            }
+            else{          
+                this.setState({userID:userID,token:token})
+                this.fetchOrder();
+                //console.log("Else wale ho beta ");
+            }
          } catch (error) {
            // Error retrieving data
-           console.log("Error he re baba :::",error);
+           console.log("Error he re baba :: ",error);
          }
          
       }
+
+      /** call for order */
+    fetchOrder = async()=>{
+       
+        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Order/History', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':'Bearer '+this.state.token
+            },
+            body:JSON.stringify({
+                userID:this.state.userID
+                })
+            }).then((response) => response.json())
+                .then(async(responseJson) => {
+                    
+                   this.setState({data:responseJson.data.data,isEmpty:"List is Empty....."});             
+                    console.log("Load History.........",responseJson);
+                    let pr=0
+                    for(var j =0;responseJson.data.data.length >j;j++)
+                    pr += responseJson.data.data[j].paid_amt
+                    this.setState({price:pr});
+            }).catch(async(error) => {
+                
+               
+                 console.log(error)
+                
+                }); 
+
+
+    }
 
 
       //store cartID 
       _storeData = async (select) => {
         try {
                 console.log(select)
-                await AsyncStorage.setItem('CartID', select.toString());
+                await AsyncStorage.setItem('cartID',JSON.stringify(select));
                 this.props.navigation.navigate("Details");
                 console.log("in storage data ",select);
 
@@ -89,57 +123,61 @@ class CartList extends React.Component{
                             )
                     }
 
-            //fire command for query in database
-    fire = async() =>{
-        let sql = "SELECT cart_lot_table.*,shop_info_table.name from cart_lot_table INNER join shop_info_table ON cart_lot_table.shop_info_id = shop_info_table.shop_info_id where customer_info_id ="+this.state.userID+" ORDER By cart_lot_table.created_at DESC";
-                  
-                    
-                        let value = await this.conn.Query(sql)
-                        if(value.flag){
-                            this.setState({data:value.data});    
-                        }
-        
-                       this.setState({isEmpty:'List is empty...'})        
-                 }
-
-
+ 
                  //Product list show data
 _renderIteamList=({item})=>{
 
-                    console.log(item);
-                
-                   // var yourBase64Icon = 'data:image/png;base64,';
+                  //  console.log(item);
+                    /**
+                       {
+                            "created_at": "2019-01-14 18:29:26",
+                            "customer_info_id": 63,
+                            "feedback": "No Feedback",
+                            "gro_cart_id": 26,
+                            "gro_shop_info_id": 5,
+                            "offer_amt": 10,
+                            "paid_amt": 75,
+                            "rating": 0,
+                            "real_amt": 85,
+                            "status": 0,
+                        }
+                     */
+                    price +=item.paid_amt
+                   var date = String(item.created_at).split(' ');
+                    var days = String(date[0]).split('-');
+                    // var hours = String(date[1]).split(':');
+                   var ds = days[2]+"-"+days[1]+"-"+days[0];
             
                     return(
                         <View style={{shadowOpacity:5,shadowColor:"#050505"}}>
-                        <TouchableOpacity onPress={()=>{ this._storeData(item.cart_lot_no);}}>
+                        <TouchableOpacity onPress={()=>{ this._storeData(item.gro_cart_id);}}>
                             <View style={{  flex:1,
                                     backgroundColor:'#ffffff', 
                                     padding:5,
                                     width:"100%", 
-                                    height:150, 
+                                    height:70, 
                                     borderRadius:5,
                                     borderWidth:1,
                                 }}>
                                  
                                 <View style={{alignItems:'center',justifyContent:'center',padding:3,margin:5,flexDirection:'row'}}>
-                                    <Text style={{fontSize:20,fontWeight:'900'}}>{item.name}</Text>
+                                    <Text style={{fontSize:14,fontWeight:'900'}}>{ds}</Text>
                                 </View>
             
                                 <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                                <Text style={{fontSize:15,fontWeight:'900'}}>Total Price : {item.total_price} </Text>
-                                <Text style={{color:'#21e004',fontSize:15,fontWeight:'900'}}>Paid Amount : {item.paid_amt}</Text>
+                                <Text style={{fontSize:12,fontWeight:'900'}}>Total Price : {item.real_amt} </Text>
+                                <Text style={{color:'#21e004',fontSize:12,fontWeight:'900'}}>Paid Amount : {item.paid_amt}</Text>
                                 </View>
                                 
                                
             
-                                <View>
+                                {/* <View>
                                 <Text style={{fontSize:15,fontWeight:'500',color:"#720664"}}>Order On : {item.created_at}</Text>
                                 </View>
                                 <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                                 <Text style={{fontSize:15,fontWeight:'900',paddingHorizontal:7,color:'#fcfcfc',backgroundColor:'#02490b'}}>*3.5</Text>
                                 <Text style={{fontSize:15,fontWeight:'400',paddingHorizontal:7,color:'#878787',}}>Rating 1,657</Text>
-                                </View>
+                                </View> */}
                             </View>
                         </TouchableOpacity>                      
                         </View>                                   
@@ -150,35 +188,83 @@ _renderIteamList=({item})=>{
 
     render(){
     
-        return(<View style={{width:'100%',flex:1,padding:2,}}>
-                    <ScrollView>                   
+        return(
+        // <View style={{width:'100%',flex:1,padding:2,}}>
+        //             <ScrollView>                   
                         
                        
-                            <FlatList
-                                data={this.state.data} 
-                                renderItem={this._renderIteamList}
-                                numColumns={1} 
-                               keyExtractor={item => item.cart_lot_no}
-                                ListEmptyComponent={()=>{
-                                    if(this.state.isEmpty =='Wait List is Loading.....')
-                                     return(<View style={{justifyContent:'center'}}>
-                                            <ActivityIndicator size="large" color="#0000ff" />
-                                            <Text>{this.state.isEmpty}</Text>
+        //                     <FlatList
+        //                         data={this.state.data} 
+        //                         renderItem={this._renderIteamList}
+        //                         numColumns={1} 
+        //                        keyExtractor={item => item.cart_lot_no}
+        //                         ListEmptyComponent={()=>{
+        //                             if(this.state.isEmpty =='Wait List is Loading.....')
+        //                              return(<View style={{justifyContent:'center'}}>
+        //                                     <ActivityIndicator size="large" color="#0000ff" />
+        //                                     <Text>{this.state.isEmpty}</Text>
     
-                                        </View>);
-                                    else
-                                    return(<View style={{justifyContent:'center'}}>
-                                            <Text>{this.state.isEmpty}</Text>
+        //                                 </View>);
+        //                             else
+        //                             return(<View style={{justifyContent:'center'}}>
+        //                                     <Text>{this.state.isEmpty}</Text>
     
-                                            </View>)}}
-                                    />   
+        //                                     </View>)}}
+        //                             />   
                         
-                    </ScrollView>
+        //             </ScrollView>
 
-                    <View style={{flexDirection:'row',justifyContent:'space-around',backgroundColor:'#f7c927'}}>
-                     {!this.state.process ?  <Button title="Re-fresh" color="#f7c927" onPress={()=>{this.fire();}}/> : <ActivityIndicator size="large" color="#0000ff" />}              
-                    </View>
-                </View>);
+        //             <View style={{flexDirection:'row',justifyContent:'space-around',backgroundColor:'#f7c927'}}>
+        //              {!this.state.process ?  <Button title="Re-fresh" color="#f7c927" onPress={()=>{this.fire();}}/> : <ActivityIndicator size="large" color="#0000ff" />}              
+        //             </View>
+        //         </View>
+        //      
+         
+        <View style={{backgroundColor:'#ffffff',marginTop:5}}>
+           <View style={{backgroundColor:'#64ed49',justifyContent:'space-between',padding:3,flexDirection:'row'}}>
+           <View style={{alignItems:'center',padding:3,margin:5,}} >
+                <Text style={{fontSize:15,fontWeight:'900',color:'#06024f'}}> Total Ammount Paid  : </Text>
+           </View>
+          
+          
+           <View style={{alignItems:'center',justifyContent:'space-between',paddingRight:5,margin:5,}} >
+                <Text style={{fontSize:15,fontWeight:'900',color:'#06024f'}}>{this.state.price}</Text>
+           </View>
+       </View>      
+
+        <View style={{width:'100%',marginTop:10,borderColor:'#3f3f3f', borderWidth:0.5 ,alignSelf:'center',backgroundColor:'#ffffff'}}>
+            <Text style={{fontSize:15,padding:5,fontWeight:'500',alignSelf:'center',textShadowColor:'#0815cc',color:'#000000'}} > SHOPPING DETAILS </Text>            
+       </View>
+     
+   
+       <View style={{backgroundColor:'#06024f',justifyContent:'space-between',padding:3,flexDirection:'row'}}>
+          
+           <Text style={{fontSize:15,fontWeight:'900',color:'#ffffff'}}> List</Text>
+           
+       </View>
+
+       <FlatList
+                       data={this.state.data}
+                       renderItem={this._renderIteamList}
+                       ListFooterComponent={this._renderFoot}
+                       keyExtractor = {(item)=>{item.gro_cart_id}}
+                       ListEmptyComponent={()=>{
+                           if(this.state.isEmpty =='Wait List is Loading.....')
+                            return(<View style={{justifyContent:'center'}}>
+                                   <ActivityIndicator size="large" color="#0000ff" />
+                                   <Text>{this.state.isEmpty}</Text>
+
+                               </View>);
+                           else
+                           return(<View style={{justifyContent:'center'}}>
+                                   <Text>{this.state.isEmpty}</Text>
+
+                                   </View>)}}
+                   />   
+    </View>
+
+
+        );
     }
 } 
 
@@ -189,12 +275,13 @@ class CartDetails extends React.Component{
         super(props);
         this.state={
             data:[],
-            isEmpty:'Wait List is Loading.....'
+            isEmpty:'Wait List is Loading .......',
+            cartID:'',
+            token:'',
+            price:''
         }
-       
-        this.conn=new Connection();
-        this.feedback = new Feedback();
-        
+         
+        this.feedback = new Feedback();    
     }
     
     refresh = async()=>{
@@ -205,7 +292,7 @@ class CartDetails extends React.Component{
     }
 
     
-    componentWillMount(){
+    componentDidMount(){
 
         console.log("It will calll mount ");
         this._start();
@@ -214,22 +301,46 @@ class CartDetails extends React.Component{
 
       //fire command for query in database
     fire = async() =>{
-        let id = await AsyncStorage.getItem('CartID');
-        //console.log("Id Return "+id);
-       let sql = " SELECT DISTINCT order_table.*,product_table.unit,product_table.price,product_list_table.P_name FROM order_table INNER JOIN product_table ON order_table.product_list_id = product_table.product_table_id INNER JOIN product_list_table ON product_list_table.p_list_id = product_table.p_list_id where order_table.cart_lot_no_id ="+id;             
+        await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Order/History/Item', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':'Bearer '+this.state.token
+            },
+            body:JSON.stringify({
+                cartID:this.state.cartID
+                })
+            }).then((response) => response.json())
+                .then(async(responseJson) => {
                     
-       let value = await this.conn.Query(sql)
-       if(value.flag){
-           this.setState({data:value.data});    
-       }
-   
-            this.setState({isEmpty:'List is empty.....'})        
-         }
+                     this.setState({data:responseJson.data.data,isEmpty:"List is Empty....."});             
+                    console.log("Load History.........",responseJson);
+                    let pr=0
+                    for(var j =0;responseJson.data.data.length >j;j++)
+                    pr += responseJson.data.data[j].real_price
+                    this.setState({price:pr});
+            }).catch(async(error) => {
+                
+               
+               //  log.error({error:err})
+                
+                });    
+     }
 
 
 
     _start = async () => {
-       await this.fire();
+
+        let cart = await AsyncStorage.getItem('cartID');
+        let token = await AsyncStorage.getItem('Token');
+        if(cart == null && token == null){
+
+            console.log("Cart ID is null.");
+            return;
+        }
+        this.setState({cartID:JSON.parse(cart),token:token});
+        await this.fire();
       }
 
 
@@ -252,25 +363,35 @@ class CartDetails extends React.Component{
 
             //Show the list of items
         _renderIteam=({item})=>{
-                
-            console.log(item)
+          /**  Object {
+                        "created_at": "2019-01-14 18:29:26",
+                        "gro_cart_id": 26,
+                        "gro_map_id": 2,
+                        "gro_order_id": 91,
+                        "gro_product_name": "Lifebuoy Nature Germ Protection Handwash",
+                        "gro_product_shop_id": null,
+                        "gro_quantity": 1,
+                        "offer_price": 0,
+                        "order_status": 0,
+                        "real_price": 85,
+                      },*/ 
                 return(
                     <View style={item.order_status==0? { backgroundColor:'#e89b9b',borderBottomWidth:1,justifyContent:'space-between',flexDirection:'row'}
                                     :{ backgroundColor:'#a6e27a',borderBottomWidth:1,justifyContent:'space-between',flexDirection:'row'}}>
                         <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
-                        <Text style={{fontSize:15,fontWeight:'900'}}> {item.P_name}</Text>
+                        <Text style={{fontSize:15,fontWeight:'900'}}> {item.gro_product_name}</Text>
                         </View>
 
                         <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
-                        <Text style={{fontSize:15,fontWeight:'900'}}> {item.price}</Text>
+                        <Text style={{fontSize:15,fontWeight:'900'}}> {item.real_price-item.offer_price}</Text>
                         </View>
 
                         <View style={{alignItems:'center',width:'25%',justifyContent:'space-between',padding:3,margin:5,}}>
-                        <Text style={{fontSize:15,fontWeight:'900'}}>{item.quantity} {item.unit}</Text>
+                        <Text style={{fontSize:15,fontWeight:'900'}}>{item.gro_quantity} {item.unit}</Text>
                         </View>
 
                         <View style={{alignItems:'center',width:'25%',justifyContent:'space-between',paddingRight:5,}} >
-                        <Text style={{fontSize:15,fontWeight:'900'}}> {item.oPrice} </Text>
+                        <Text style={{fontSize:15,fontWeight:'900'}}> {(item.real_price - item.offer_price)*item.gro_quantity} </Text>
                         </View>
                     
 
@@ -352,6 +473,7 @@ const Rocket =createStackNavigator({
 });
 
 export default class Order extends React.Component{
+    
     render(){
         return(<View style={{flex:1}}><Rocket/></View> )
     }

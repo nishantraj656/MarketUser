@@ -16,10 +16,12 @@ import {
 import { Container, Spinner, Button,Text, Item,Input,CheckBox,Body} from 'native-base';
 import {createDrawerNavigator,DrawerItems, SafeAreaView,createStackNavigator,NavigationActions } from 'react-navigation';
 import Icon  from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Permissions, Notifications } from 'expo';
 import { } from 'react-native-elements'
 
 //import Global from '../../constants/Global';
 const {height,width} = Dimensions.get('window');
+const API_URL = "http://gomarket.ourgts.com/public/api/";
 export default class Login extends Component {
     constructor(props){
         super(props);
@@ -72,6 +74,7 @@ export default class Login extends Component {
             forgot_sendOTPButtonDisable:false,
             askOTP:false,
 
+            obj:this.props.obj,
         }
     }
 
@@ -174,7 +177,7 @@ export default class Login extends Component {
             var username = this.state.email_or_phone.toLowerCase();
             var password = this.state.password;
             console.log(username+":"+password);
-            fetch(Global.API_URL+'login_S', {
+            fetch(API_URL+'login_MU', {
                 method: 'POST',
                 headers: {
                     
@@ -182,7 +185,7 @@ export default class Login extends Component {
                 body: JSON.stringify({
                     email:username,
                     password:password,
-                    user_type:'worker',
+                    user_type:'user',
                     noti_token:Date()+"",
                 })
             }).then((response) => response.json())
@@ -194,7 +197,7 @@ export default class Login extends Component {
                         alert("Invalid Email or password");
                         return;
                     }
-                    alert("Internal Server error 5004");
+                    alert("Internal Server error 504");
                     
                     this.setState({submitButtonDisable:false});
                     return;
@@ -227,13 +230,13 @@ export default class Login extends Component {
     _signInAsync = async (token,profileData,userID) => {
         userID = userID + "";//converting to string
         console.log("setting token");
-        await AsyncStorage.setItem('userToken_S', token);
+        await AsyncStorage.setItem('Token', token);
         console.log("setting user data");
-        await AsyncStorage.setItem('userID', userID);
-
+        await AsyncStorage.setItem('UserID', userID);
+        console.log("Profile set :",profileData);
         await AsyncStorage.setItem('userProfileData', profileData);
         console.log("sending to home");
-        this.props.navigation.navigate('Home');
+        this.state.obj.navigate('MyCart');
         console.log("seneing to app");
     };
     saveNotificationToken = () => {
@@ -242,7 +245,7 @@ export default class Login extends Component {
     
 
     // handle regiter 
-    submitRegister = () =>{
+    submitRegister = async() =>{
         if(
             this.state.reg_name_valid_color != 'green' ||
             this.state.reg_phone_valid_color != 'green' ||
@@ -275,7 +278,30 @@ export default class Login extends Component {
             alert("Confirm password dont matched with previous one!!");
             return;
         }
-
+        /** Notifaction  */
+        const { status: existingStatus } = await Permissions.getAsync(
+            Permissions.NOTIFICATIONS
+          );
+          let finalStatus = existingStatus;
+        
+          // only ask if permissions have not already been determined, because
+          // iOS won't necessarily prompt the user a second time.
+          if (existingStatus !== 'granted') {
+            // Android remote notification permissions are granted during the app
+            // install, so this will only ask on iOS
+            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+            finalStatus = status;
+          }
+        
+          // Stop here if the user did not grant permissions
+          if (finalStatus !== 'granted') {
+            return;
+          }
+        
+          // Get the token that uniquely identifies this device
+          let token = await Notifications.getExpoPushTokenAsync();
+          console.log("Token :",token);
+          /**Noti fication code end */
 
         // now sending request to login
         var connectionInfoLocal = '';
@@ -300,7 +326,7 @@ export default class Login extends Component {
             var c_password = this.state.reg_confirm;
             var phone = this.state.reg_phone;
             console.log(name,":",email,":",password,":",c_password,":",phone);
-            fetch(Global.API_URL+'register_S', {
+            fetch(API_URL+'register_MU', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -311,8 +337,8 @@ export default class Login extends Component {
                     'password':password,
                     'c_password':c_password,
                     'phone':phone,
-                    'user_type':'worker',
-                     noti_token:Date()+"",
+                    'user_type':'user',
+                     noti_token:token,
 
                 })
             }).then((response) => response.json())
@@ -323,13 +349,18 @@ export default class Login extends Component {
                     this.setState({reg_submitButtonDisable:false});
                     return;
                 }
+
                 var itemsToSet = responseJson.success.token; 
-                var profileData = responseJson.profileData;
+                var token = responseJson.token;
                 var userID = responseJson.userID;
+                var profileData = responseJson.profileData;
                 if(responseJson.reg_done == 'yes'){
+                   /** */
                     console.log("now calling to signin and sending to home");
-                    this._signInAsync(itemsToSet,JSON.stringify(profileData),userID);
+                  this._signInAsync(itemsToSet,JSON.stringify(profileData),userID);
                     this.setState({reg_submitButtonDisable:false});
+                   AsyncStorage.setItem("UserID",userID);
+                    AsyncStorage.setItem("Token",token);
                     return;
                 }else{
                     alert("Invalid Email or Password");
@@ -456,7 +487,7 @@ export default class Login extends Component {
                 );        
             }else{
                 console.log("yes internet ");
-                fetch(Global.API_URL+'AvilEmail', {
+                fetch(API_URL+'AvilEmail_MU', {
                     method: 'POST',
                     headers: {},
                     body: JSON.stringify({
@@ -501,7 +532,7 @@ export default class Login extends Component {
                 );        
             }else{
                 console.log("yes internet ");
-                fetch(Global.API_URL+'AvilPhone', {
+                fetch(API_URL+'AvilPhone_MU', {
                     method: 'POST',
                     headers: {},
                     body: JSON.stringify({
@@ -602,7 +633,7 @@ export default class Login extends Component {
                 var c_password = this.state.reg_confirm;
                 var phone = this.state.reg_phone;
                 console.log(name,":",email,":",password,":",c_password,":",phone);
-                fetch(Global.API_URL+'send_OTP_S', {
+                fetch(API_URL+'send_OTP_MU', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -610,7 +641,7 @@ export default class Login extends Component {
                     body: JSON.stringify({
                         'email':email,
                         'OTP':this.state.OTPreal,
-                        'user_type':'worker',
+                        'user_type':'user',
                         noti_token:Date()+"",
     
                     })
@@ -693,7 +724,7 @@ export default class Login extends Component {
                 );        
             }else{
                 console.log("yes internet ");
-                fetch(Global.API_URL+'AvilEmail', {
+                fetch(API_URL+'AvilEmail_MU', {
                     method: 'POST',
                     headers: {},
                     body: JSON.stringify({
@@ -779,7 +810,7 @@ export default class Login extends Component {
                 var c_password = this.state.reg_confirm;
                 var phone = this.state.reg_phone;
                 console.log(name,":",email,":",password,":",c_password,":",phone);
-                fetch(Global.API_URL+'change_password_S', {
+                fetch(API_URL+'change_password_MU', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -788,7 +819,7 @@ export default class Login extends Component {
                         'email':email,
                         'password':password,
                         'c_password':c_password,
-                        'user_type':'worker',
+                        'user_type':'user',
                         noti_token:Date()+"",
     
                     })
@@ -846,7 +877,7 @@ export default class Login extends Component {
                             </View>
                             <View style={{alignSelf:'center',top:height*(0.07)}}>
                                 <Button rounded bordered info style={{alignSelf:'center',margin:5,paddingHorizontal:20}} onPress={()=>{this._openLoginModel()}}>
-                                    <Text>Login</Text>
+                                    <Text>Sign In</Text>
                                 </Button>
                                 <Button rounded bordered light style={{alignSelf:'center',margin:5,paddingHorizontal:15}} onPress={()=>{this._openSignUpModel()}}>
                                     <Text>Sign Up</Text>
