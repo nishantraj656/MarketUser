@@ -14,8 +14,8 @@ import {
         } from 'react-native';
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import RestaurantList from './RestaurantList';
-/** import Category from './Category';
-import SubCategory from '../SubCategory/SubCategory';
+import Category from '../Shop/category/ShopCategory';
+/*import SubCategory from '../SubCategory/SubCategory';
 import ProductsList from '../ProductDetails/ProductsList';
 import ProductDetails from '../ProductDetails/ProductDetails';
 import Slider from '../slider/Slider';
@@ -34,7 +34,7 @@ class CategoryScreen extends React.Component
        return(
             <View style={{flex:1}}>
                 <ScrollView>
-                    <RestaurantList obj={this.state.obj} />
+                    <Category obj={this.state.obj} />
                 </ScrollView>
               
             </View>
@@ -94,8 +94,7 @@ class MallListScreen extends React.Component
         super(props);
         this.state={
             categoryID:'0',
-            subCategorySQL:null,
-            productListSQL:null,
+         
         }
     }
 
@@ -118,7 +117,7 @@ class MallListScreen extends React.Component
 
     render(){
 
-        if(this.state.subCategorySQL != null && this.state.productListSQL != null)
+      
         return(
             <View style={{flex:1}}>
                 <ScrollView>
@@ -128,9 +127,7 @@ class MallListScreen extends React.Component
             </View>
             
         );
-        else
-        return(<View style={{flex:1,justifyContent:'center'}}><ActivityIndicator size="large" color="#0000ff" />
-        </View>);
+       
     }
 } 
 
@@ -149,12 +146,7 @@ class ProductDetailsScreen extends React.Component
 
 export const MallNavigator = createStackNavigator(
     {
-      Category: { screen: CategoryScreen,
-                    navigationOptions: () => ({
-                        header:null,
-                        
-                    }),
-                 },
+      
       MallList: { screen:MallListScreen ,
                         navigationOptions: () => ({
                             
@@ -163,6 +155,12 @@ export const MallNavigator = createStackNavigator(
                             gestureDirection:'inverted',
                              }),
                     },
+    Category: { screen: CategoryScreen,
+        navigationOptions: () => ({
+            header:null,
+            
+        }),
+        },
       ProductList:{screen:ProductListScreen,
                     navigationOptions: () => ({
                                          

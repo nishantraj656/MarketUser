@@ -5,6 +5,7 @@ import {createStackNavigator} from 'react-navigation';
 
 import { ScrollView } from 'react-native-gesture-handler';
 import Feedback from '../Feedback/Feedback';
+import { Icon } from 'native-base';
 
 
 
@@ -22,7 +23,8 @@ class CartList extends React.Component{
             process:false,
             isEmpty:'Wait List is Loading.....',
             token:'',
-            price:0
+            price:0,
+            profile:{}
         } 
       
     }
@@ -37,13 +39,15 @@ class CartList extends React.Component{
         try {
           let token = await AsyncStorage.getItem('Token');
           let userID = await AsyncStorage.getItem('UserID');
-            if ( userID == null && token == null) {
+          let profile = await AsyncStorage.getItem('userProfileData');
+            if ( userID == null || token == null ||profile == null) {
 
                 // We have data!!         
                 console.log("We have not any data ");
             }
-            else{          
-                this.setState({userID:userID,token:token})
+            else{  
+                profile = JSON.parse(profile);        
+                this.setState({userID:userID,token:token,profile:profile})
                 this.fetchOrder();
                 //console.log("Else wale ho beta ");
             }
@@ -65,7 +69,7 @@ class CartList extends React.Component{
                 'Authorization':'Bearer '+this.state.token
             },
             body:JSON.stringify({
-                userID:this.state.userID
+                userID:this.state.profile.customer_info_id
                 })
             }).then((response) => response.json())
                 .then(async(responseJson) => {
@@ -118,7 +122,7 @@ class CartList extends React.Component{
     _renderFoot =() =>{
                         return(
                                 <View style={{paddingVertical:20,borderTopWidth:1,borderTopColor:'#CED0CE'}}>
-                                    <ActivityIndicator animating size="large"/>
+                                    {/* <ActivityIndicator animating size="large"/> */}
                                 </View>
                             )
                     }
@@ -127,48 +131,69 @@ class CartList extends React.Component{
                  //Product list show data
 _renderIteamList=({item})=>{
 
-                  //  console.log(item);
+                    //console.log(item);
                     /**
-                       {
-                            "created_at": "2019-01-14 18:29:26",
+                        {
+                            "created_at": "2019-01-19 16:18:55",
                             "customer_info_id": 63,
                             "feedback": "No Feedback",
-                            "gro_cart_id": 26,
-                            "gro_shop_info_id": 5,
+                            "gro_cart_id": 28,
+                            "gro_shop_info_id": 6,
+                            "name": "thomos",
                             "offer_amt": 10,
-                            "paid_amt": 75,
+                            "paid_amt": 330,
                             "rating": 0,
-                            "real_amt": 85,
+                            "real_amt": 340,
                             "status": 0,
-                        }
+                        },
                      */
                     price +=item.paid_amt
                    var date = String(item.created_at).split(' ');
                     var days = String(date[0]).split('-');
-                    // var hours = String(date[1]).split(':');
-                   var ds = days[2]+"-"+days[1]+"-"+days[0];
+                    var hours = String(date[1]).split(':');
+                   var ds = days[2]+"/"+days[1]+"/"+days[0]+"  "+date[1];
             
                     return(
                         <View style={{shadowOpacity:5,shadowColor:"#050505"}}>
                         <TouchableOpacity onPress={()=>{ this._storeData(item.gro_cart_id);}}>
                             <View style={{  flex:1,
-                                    backgroundColor:'#ffffff', 
+                                    backgroundColor:(item.real_amt-item.offer_amt) != item.paid_amt? (item.real_amt-item.offer_amt)!=(item.real_amt-item.offer_amt)-item.paid_amt? '#e59587':'#e04f35':'#ffffff', 
                                     padding:5,
                                     width:"100%", 
-                                    height:70, 
+                                    height:120, 
                                     borderRadius:5,
                                     borderWidth:1,
                                 }}>
                                  
-                                <View style={{alignItems:'center',justifyContent:'center',padding:3,margin:5,flexDirection:'row'}}>
-                                    <Text style={{fontSize:14,fontWeight:'900'}}>{ds}</Text>
+                                <View style={{alignItems:'center',justifyContent:'center',padding:3,flexDirection:'row'}}>
+                                    <Text style={{fontSize:16,fontWeight:'900'}}>Cart No. :{item.gro_cart_id}  {item.name}</Text>
                                 </View>
             
                                 <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                                <Text style={{fontSize:12,fontWeight:'900'}}>Total Price : {item.real_amt} </Text>
-                                <Text style={{color:'#21e004',fontSize:12,fontWeight:'900'}}>Paid Amount : {item.paid_amt}</Text>
+                               
+                                <View>
+                                <Text style={{fontSize:25,fontWeight:'900'}}> {item.real_amt-item.offer_amt} </Text>
+                               
+                                <Text style={{fontSize:20,fontWeight:'900'}}>Total Price</Text>
+                               
                                 </View>
-                                
+
+                                <View>
+                               {item.status==0? 
+                               <Text style={{color:'#bfed07',fontSize:20,fontWeight:'900'}}>Wait...</Text>
+                               :<Icon name={item.status!=0?"cart":"cart-off"} size={20}/>
+                                } 
+                                </View>
+
+                                <View>
+                                <Text style={{fontSize:25,fontWeight:'900'}}>{(item.real_amt-item.offer_amt)-item.paid_amt}</Text>
+                                 <Text style={{fontSize:20,fontWeight:'900'}}>Dues  </Text>
+                               
+                                 </View>
+                                </View>
+                                <View style={{alignItems:'center',justifyContent:'center',padding:1,flexDirection:'row'}}>
+                                    <Text style={{fontSize:12}}>Date - {ds}</Text>
+                                </View>
                                
             
                                 {/* <View>
