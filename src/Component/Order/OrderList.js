@@ -109,13 +109,18 @@ class CartList extends React.Component{
       
       _storeDataForProduct = async (select) => {
         try {
-          await AsyncStorage.setItem('chooseItem', select);
-          console.log("in storage data ",select);
-          this.props.navigation.navigate('Details');
-        } catch (error) {
-          // Error saving data
-          console.log("Error in store data beta ",error);
-        }
+            
+                await AsyncStorage.setItem('chooseItem', select);
+                console.log("in storage data ",select);
+                this.props.navigation.navigate('Details');
+
+            } 
+            catch (error) {
+
+                // Error saving data
+                console.log("Error in store data beta ",error);
+
+            }
       }
 
    
