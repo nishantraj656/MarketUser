@@ -130,12 +130,15 @@ const HomeStack = createStackNavigator(
     {
         Home:{
             screen:CategoryScreen,
-            navigationOptions: ({ navigation }) => ({
-                headerTitle: <HeaderTitle title="Service Manager"/>,
-                headerStyle: {
-                    backgroundColor: '#2874f0'
-                },
-                headerLeft: <MenuButton obj={navigation}  />,
+            // navigationOptions: ({ navigation }) => ({
+            //     headerTitle: <HeaderTitle title="Service Manager"/>,
+            //     headerStyle: {
+            //         backgroundColor: '#2874f0'
+            //     },
+            //     headerLeft: <MenuButton obj={navigation}  />,
+            // }),
+            navigationOptions: () => ({
+                header: null,
             }),
             
         } ,
@@ -184,7 +187,7 @@ export const ServiceTab = createBottomTabNavigator(
       navigationOptions: ({ navigation }) => ({
         tabBarIcon: ({ focused, tintColor }) => {
             const { routeName } = navigation.state;
-            let iconName;
+            let iconName='worker';
             if(routeName == 'Home'){
                 iconName =`home${focused?'':''}`;
             } else if (routeName === 'History') {
