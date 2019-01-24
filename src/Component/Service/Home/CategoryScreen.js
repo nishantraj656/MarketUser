@@ -42,79 +42,79 @@ class CategoryList extends Component{
         this.state = {
             renderCoponentFlag: false,
             cat_subcat_list:[
-                {
-                  "category": "Travel",
-                  "subcategory": [
-                    {
-                      "key": 1,
-                      "value": "Bolero, Sumos"
-                    },
-                    {
-                      "key": 2,
-                      "value": "E-rikshaw"
-                    }
-                  ]
-                },
-                {
-                  "category": "Repair",
-                  "subcategory": [
-                    {
-                      "key": 3,
-                      "value": "Electronic appliances"
-                    },
-                    {
-                      "key": 4,
-                      "value": "Home wiring & Fitting"
-                    },
-                    {
-                      "key": 5,
-                      "value": "Computer & Laptops"
-                    },
-                    {
-                      "key": 6,
-                      "value": "Furnitures"
-                    },
-                    {
-                      "key": 7,
-                      "value": "Two Wheeler"
-                    },
-                    {
-                      "key": 8,
-                      "value": "Three Wheeler"
-                    },
-                    {
-                      "key": 9,
-                      "value": "Four Wheeler"
-                    }
-                  ]
-                },
-                {
-                  "category": "Software",
-                  "subcategory": [
-                    {
-                      "key": 10,
-                      "value": "Computer Format"
-                    },
-                    {
-                      "key": 11,
-                      "value": "Drivers & Softwares"
-                    },
-                    {
-                      "key": 12,
-                      "value": "Misc Services"
-                    }
-                  ]
-                }
+                // {
+                //   "category": "Travel",
+                //   "subcategory": [
+                //     {
+                //       "key": 1,
+                //       "value": "Bolero, Sumos"
+                //     },
+                //     {
+                //       "key": 2,
+                //       "value": "E-rikshaw"
+                //     }
+                //   ]
+                // },
+                // {
+                //   "category": "Repair",
+                //   "subcategory": [
+                //     {
+                //       "key": 3,
+                //       "value": "Electronic appliances"
+                //     },
+                //     {
+                //       "key": 4,
+                //       "value": "Home wiring & Fitting"
+                //     },
+                //     {
+                //       "key": 5,
+                //       "value": "Computer & Laptops"
+                //     },
+                //     {
+                //       "key": 6,
+                //       "value": "Furnitures"
+                //     },
+                //     {
+                //       "key": 7,
+                //       "value": "Two Wheeler"
+                //     },
+                //     {
+                //       "key": 8,
+                //       "value": "Three Wheeler"
+                //     },
+                //     {
+                //       "key": 9,
+                //       "value": "Four Wheeler"
+                //     }
+                //   ]
+                // },
+                // {
+                //   "category": "Software",
+                //   "subcategory": [
+                //     {
+                //       "key": 10,
+                //       "value": "Computer Format"
+                //     },
+                //     {
+                //       "key": 11,
+                //       "value": "Drivers & Softwares"
+                //     },
+                //     {
+                //       "key": 12,
+                //       "value": "Misc Services"
+                //     }
+                //   ]
+                // }
               ],
         }
     }
     componentDidMount() {
         setTimeout(() => {this.setState({renderCoponentFlag: true})}, 0);
-        // this.renderCatSubCatData();
+        this.renderCatSubCatData();
     }
     renderCatSubCatData = async () => {
         var connectionInfoLocal = '';
-        var KEY = await AsyncStorage.getItem('userToken_S');
+        var KEY = await AsyncStorage.getItem('Token');
         NetInfo.getConnectionInfo().then((connectionInfo) => {
             console.log('Initial, type: ' + connectionInfo.type + ', effectiveType: ' + connectionInfo.effectiveType);
             // connectionInfo.type = 'none';//force local loding
@@ -129,6 +129,9 @@ class CategoryList extends Component{
                 );
                 return;
             }else{
+                this.setState({
+                    renderCoponentFlag:false
+                });
                 console.log('yes internet '); 
                 fetch(Global.API_URL+'cat_sub_cat_US', {
                     method: 'POST',
@@ -141,10 +144,21 @@ class CategoryList extends Component{
                 .then((responseJson) => {
                     var itemsToSet = responseJson.data;
                     console.log('resp:',itemsToSet);
-                    this.setState({
-                        cat_subcat_list:itemsToSet,
-                        renderCoponentFlag: true
-                    })
+                    if(responseJson.received == 'yes'){
+                        this.setState({
+                            cat_subcat_list:itemsToSet,
+                            renderCoponentFlag: true
+                        })
+                    }else{
+                        ToastAndroid.showWithGravityAndOffset(
+                            'Internal Server Error',
+                            ToastAndroid.LONG,
+                            ToastAndroid.BOTTOM,
+                            25,
+                            50,
+                        );
+                    }
+                    
             }).catch((error) => {
                 ToastAndroid.showWithGravityAndOffset(
                     'Network Failed!!! Retrying...',

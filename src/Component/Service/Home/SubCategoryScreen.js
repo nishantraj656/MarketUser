@@ -43,7 +43,7 @@ export default class SubCategoryScreen extends Component {
     }
     render_ServiceManList = async (subcategoryID) => {
         var connectionInfoLocal = '';
-        var KEY = await AsyncStorage.getItem('userToken_S');
+        var KEY = await AsyncStorage.getItem('Token');
         NetInfo.getConnectionInfo().then((connectionInfo) => {
             console.log('Initial, type: ' + connectionInfo.type + ', effectiveType: ' + connectionInfo.effectiveType);
             // connectionInfo.type = 'none';//force local loding
@@ -75,12 +75,23 @@ export default class SubCategoryScreen extends Component {
                     .then((responseJson) => {
                         var itemsToSet = responseJson.data;
                         console.log('resp serviceman list:',responseJson);
-                        this.setState({
-                            LodingModal:false,
-                        });
-                        this.props.navigation.navigate('ServiceManListScreen',{
-                            ServiceManList:itemsToSet
-                        });
+                        if(responseJson.received == 'yes'){
+                            this.setState({
+                                LodingModal:false,
+                            });
+                            this.props.navigation.navigate('ServiceManListScreen',{
+                                ServiceManList:itemsToSet
+                            });
+                        }else{
+                            ToastAndroid.showWithGravityAndOffset(
+                                'Internal Server Error',
+                                ToastAndroid.LONG,
+                                ToastAndroid.BOTTOM,
+                                25,
+                                50,
+                            );
+                        }
+                        
                 }).catch((error) => {
                     ToastAndroid.showWithGravityAndOffset(
                         'Network Failed!!! Retrying...',

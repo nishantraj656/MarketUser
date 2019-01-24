@@ -41,10 +41,19 @@ const {width,height} = Dimensions.get('window');
 export default class HireMeScreen extends Component {
     constructor(props){
         super(props);
+        let nav = this.props.navigation;
+        console.log("hireme contrller:",nav.getParam('profileData'));
         this.state = {
             renderCoponentFlag: false,
             LodingModal: false,
             submitButtonDisalbe:false,
+            workerAvtar: nav.getParam('profileData', {avtar:'https://i.imgur.com/uj2JaPH.jpg'}).avtar,
+            workerName:nav.getParam('profileData', {name:'-----'}).name,
+            workerID: nav.getParam('profileData', {workerID:'--'}).workerID,
+            workList: nav.getParam('profileData',{workList:[{   'key':'work','value':'000-0000' , 'workSubCatId':'10' },{   'key':'work1','value':'000-00001' , 'workSubCatId':'1' }]}).workList,
+            WorkSubCatID: '0',
+            message: 'Nan',
+            title: 'Nan',
         }
     }
     componentDidMount() {
@@ -52,7 +61,8 @@ export default class HireMeScreen extends Component {
     }
     render_HandleSendRequest = async () => {
         var connectionInfoLocal = '';
-        var KEY = await AsyncStorage.getItem('userToken_S');
+        var KEY = await AsyncStorage.getItem('Token');
+        var customerID = await AsyncStorage.getItem('UserID');
         NetInfo.getConnectionInfo().then((connectionInfo) => {
             console.log('Initial, type: ' + connectionInfo.type + ', effectiveType: ' + connectionInfo.effectiveType);
             // connectionInfo.type = 'none';//force local loding
@@ -72,28 +82,37 @@ export default class HireMeScreen extends Component {
                     LodingModal:true,
                     submitButtonDisalbe:true,
                 })
-                fetch(Global.API_URL+'render_HandleSendRequest_MU', {
+                fetch(Global.API_URL+'render_HandleSendRequest_HierMe_US', {
                     method: 'POST',
                     headers: {
                             'Accept': 'application/json',
                             'Authorization':'Bearer '+KEY,
                         },
-                        body: JSON.stringify({  })
+                        body: JSON.stringify({ 
+                            workerID: this.state.workerID,
+                            WorkSubCatID: this.state.WorkSubCatID,
+                            customerID: customerID,
+                            message: this.state.message,
+                            title: this.state.title,
+                         })
                     }).then((response) => response.json())
                     .then((responseJson) => {
                         var itemsToSet = responseJson.data;
-                        console.log('resp:',itemsToSet);
-                        this.setState({
-                            LodingModal:false,
-                            
-                        });
-                        ToastAndroid.showWithGravityAndOffset(
-                            'Successuly Sent',
-                            ToastAndroid.LONG,
-                            ToastAndroid.BOTTOM,
-                            25,
-                            50,
-                        );
+                        console.log('resp:',responseJson);
+                        if(responseJson.received == 'yes'){
+                            this.setState({
+                                LodingModal:false,
+                                
+                            });
+                            ToastAndroid.showWithGravityAndOffset(
+                                'Successuly Sent',
+                                ToastAndroid.LONG,
+                                ToastAndroid.BOTTOM,
+                                25,
+                                50,
+                            );
+                        }
+                        
                         // this.props.navigation.navigate('BackTOHome',{
                         //     ProfileData:itemsToSet,
                         // });
@@ -117,41 +136,47 @@ export default class HireMeScreen extends Component {
     }
     render() {
         const {renderCoponentFlag} = this.state;
+        let workList = this.state.workList.map( (s, i) => {
+            return <Picker.Item key={i} value={s.workSubCatId} label={s.key} />
+        });
         if(renderCoponentFlag){
             return(
                 <Container>
                     <Content>
                         <Card>
                             <CardItem>
-                                <Thumbnail square source={{ uri: 'https://instagram.fpat1-1.fna.fbcdn.net/vp/84c4e443d47dc2aa70a613a017a4c001/5CBB0AAC/t51.2885-19/s150x150/31908285_2109461939310314_4190149362170462208_n.jpg?_nc_ht=instagram.fpat1-1.fna.fbcdn.net' }} />
-                                <Text style={{marginLeft:10,fontSize:25,fontWeight:'700'}}>Aarav Kumar</Text>
+                                <Thumbnail square source={{ uri: this.state.workerAvtar }} />
+                                <Text style={{marginLeft:10,fontSize:25,fontWeight:'700'}}>{this.state.workerName}</Text>
                             </CardItem>
                         </Card>
                         <Card>
                             <Form>
                                 <Item>
-                                    <Picker
+                                    
+                                    <Picker    
                                         mode="dropdown"
-                                        iosIcon={<Icon name="arrow-down" />}
-                                        placeholder="Select your SIM"
-                                        placeholderStyle={{ color: "#bfc6ea" }}
-                                        placeholderIconColor="#007aff"
-                                        style={{ width: undefined }}
-                                        // selectedValue={}
-                                        // onValueChange={}
-                                    >
-                                        <Picker label="Wallet" value="key0" />
-                                        <Picker label="ATM Card" value="key1" />
-                                        <Picker label="Debit Card" value="key2" />
-                                        <Picker label="Credit Card" value="key3" />
-                                        <Picker label="Net Banking" value="key4" />
+                                        style={{  width: '70%', height:32 }}
+                                        selectedValue={this.state.SelectedCategory}
+                                        onValueChange={(itemValue, itemIndex) => {
+                                            console.log("itemvalue:",itemValue+" Item inedex:"+itemIndex);
+                                            this.setState({WorkSubCatID: itemValue});
+                                        }}
+                                        >
+                                        {workList}
                                     </Picker>
                                 </Item>
                                 
                                 <Item regular>
-                                    <Input placeholder='Enter your work Title'/>
+                                    <Input 
+                                        placeholder='Enter your work Title'
+                                        onChangeText={(text) => this.setState({title:text})} 
+                                        />
                                 </Item>
-                                <Textarea rowSpan={5} bordered placeholder="Type Some Message..." />
+                                <Textarea 
+                                    rowSpan={5} bordered 
+                                    placeholder="Type Some Message..." 
+                                    onChangeText={(text) => this.setState({message:text})} 
+                                    />
                                 <Button block danger
                                 disabled={this.state.submitButtonDisalbe} onPress={this.render_HandleSendRequest}>
                                     <Text>Send Him A Request</Text>
