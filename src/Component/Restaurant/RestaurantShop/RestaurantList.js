@@ -51,7 +51,7 @@ export default class RestaurantList extends React.Component{
             }).then((response) => response.json())
                 .then((responseJson) => {
                 
-                console.log("Shop List Load ......",responseJson);
+                console.log("Resturen List Load ......",responseJson);
               this.setState({data:responseJson.data.data}); 
             //  console.log("On shop  value :", value);
             }).catch((error) => {
@@ -71,7 +71,7 @@ export default class RestaurantList extends React.Component{
         try{
          
             await AsyncStorage.setItem('ResShopID',JSON.stringify(sID))
-           // this.state.obj.navigate('Category');
+            this.state.obj.navigate('Category');
         }
         catch(error){
             console.log("Eroor he Product list me ",error);
@@ -81,17 +81,22 @@ export default class RestaurantList extends React.Component{
 
     _renderIteam=({item})=>{
         console.log("Resturent Load : ",item);  
-        /**{
-         "address": "",
-         "created_date": "2018-12-20 11:54:19",
-         "location": "",
-         "name": "Veeru",
-         "pic": "",
-         "points": "",
-         "res_info_id": 2,
-         "updated_date": "0000-00-00 00:00:00",
-         "user_id": 66,
-       } */      
+        /** {
+                 "DCharge": 0,
+                "address": "",
+                "city": "",
+                "created_date": "2019-01-13 08:40:15",
+                "isDelivry": 1,
+                "name": "Beeru3",
+                "pic": "",
+                "pincode": null,
+                "points": "",
+                "res_info_id": 3,
+                "state": "Bihar",
+                "updated_at": "2019-01-13 09:32:25",
+                "user_id": 69,
+                "visiblilty": 1
+            } */      
         let uri;
         try {
           item.pic == null ||item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=item.pic;  

@@ -334,7 +334,7 @@ const CustomDrawerContentComponent = (props) => (
         screen: MyOrderScreen,
       },
     Service: {
-        screen:ServiceTab,
+        screen:MyServiceScreen,
       },
     MyCart:{
         screen:MyCartScreen,
@@ -343,7 +343,7 @@ const CustomDrawerContentComponent = (props) => (
       screen:MyLoginScreen,
     },
   },{
-    initialRouteName:'Service',
+    initialRouteName:'Home',
     contentComponent:CustomDrawerContentComponent
   });
 

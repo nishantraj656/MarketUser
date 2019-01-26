@@ -4,11 +4,12 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import { CartRemoveItem } from './ListPrepare';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Login from '../Login';
-//import { listReturn } from './ListPrepare';
+import {Container, Header, Content, Item, Input, Title} from 'native-base';
+
+// import Login from '../Login';
+// import { listReturn } from './ListPrepare';
 
 const quer2=null;
-
 
 export default class CartDetails extends React.Component{
     
@@ -30,14 +31,13 @@ export default class CartDetails extends React.Component{
                                 "location": "kfjdkl",
                                 "name": "Beeru",
                                 "rating": 4,
-                                "state": "Bihar",
-                                
+                                "state": "Bihar", 
                                 "user_id": 1
-                            },  // id of current selected shop   */
+                            } */
             userID:'1', //user id   
             cartID:'0', //cart id   
             shopID:'1', //shopID
-            islogin:1,  
+            islogin:2,  
             refreshing:false,
             isEmpty:"Wait List is Loading.....", //message to show while loading 
             cartItem:0, //No. of item in cart    
@@ -49,20 +49,15 @@ export default class CartDetails extends React.Component{
             GroceryShop:[], //Selected Grocery Product
             groceryArrayItem:[],//selectedArray
            token:'',
-          /** region: {
-            latitude:       LATITUDE,
-            longitude:      LONGITUDE,
-            latitudeDelta:  LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          },
-          marker: {
-            latlng:{
-              latitude:       null,
-              longitude:      null,
-              latitudeDelta:  LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA
-            }
-            } */
+           profile:{},
+           OrderAddress:{
+               houseNo:23,
+               pincode:889345,
+               city:'Bhagalpur',
+               state:'Bihar',
+               name:'',
+               mobileno:'+91 9939224274'
+           }
         }
 
     }
@@ -70,15 +65,6 @@ export default class CartDetails extends React.Component{
 
     componentDidMount(){
 
-        // navigator.geolocation.getCurrentPosition (
-        //     (position) => { alert("value:" + position) },
-        //     (error)    => { console.log(error) },
-        //     {
-        //       enableHighAccuracy: true,
-        //       timeout:            20000,
-        //       maximumAge:         10000
-        //     }
-        //   )
        this._inslization();
        this.fetechShopList();
        
@@ -99,8 +85,8 @@ export default class CartDetails extends React.Component{
             }).then((response) => response.json())
                 .then((responseJson) => {
                 
-              this.setState({GroceryShop:responseJson.data.data,isEmpty:"List is empty..."}); 
-            //  console.log("On shop  value :", value);
+         this.setState({GroceryShop:responseJson.data.data,isEmpty:"List is empty..."}); 
+              console.log("On shop  value :", responseJson);
             }).catch((error) => {
                     
                 //  alert("updated slow network");
@@ -158,12 +144,42 @@ export default class CartDetails extends React.Component{
 
                 /** call for order */
     prepareOrder = async()=>{
-        let value = await AsyncStorage.getItem('ShopID')
+
+        /**Object {
+   "0": Object {
+     "address": "Your Address",
+     "city": "Bhagalpur",
+     "cname": "Your Name",
+     "cpin": 812001,
+     "customer_info_id": 2,
+     "location": "location",
+     "pic": "",
+     "state": "Bihar",
+     "user_id": 63,
+   },
+   "address": "Your Address",
+   "city": "Bhagalpur",
+   "cname": "Your Name",
+   "cpin": 812001,
+   "customer_info_id": 2,
+   "location": "location",
+   "pic": "",
+   "state": "Bihar",
+   "user_id": 63,
+ } */
+
+
         
-        if(value ==null ){
+
+        let value = await AsyncStorage.getItem('ShopID');
+        let shopData = await AsyncStorage.getItem('ShopIDatat');
+        if(value ==null || shopData == null){
            return; 
         }
-      console.log("Prepared Array :",this.state.groceryArrayItem.length);
+       
+       // console.log("Uder Prepare :",JSON.parse(shopData).noti_token);
+        
+    
        for(var i =0;i<this.state.avilableItem.length;i++){
         var dumpArray = {
             "map_id":this.state.avilableItem[i].gro_map_id,
@@ -186,9 +202,10 @@ export default class CartDetails extends React.Component{
             body:JSON.stringify({
                 real_Price:this.state.priceTopay,
                 Offer_Price:this.state.offerAmt,
-                paid_amt:(this.state.priceTopay-this.state.offerAmt),
-                customerID:this.state.userID,
-                Order_address:"at - Bhahalpur gro_shop_info_id",
+                paid_amt:(0),
+                customerID:this.state.profile.customer_info_id,
+                Order_address:"Name : "+this.state.OrderAddress.name+" ,Address :- "+this.state.OrderAddress.houseNo+" , "+
+                        this.state.OrderAddress.city+" , "+this.state.OrderAddress.state +" , "+this.state.OrderAddress.pincode,
                 gro_shop_ID:JSON.parse(value),
                 Item:this.state.groceryArrayItem
                 })
@@ -196,6 +213,7 @@ export default class CartDetails extends React.Component{
                 .then(async(responseJson) => {
                     alert("Order Placed");
                     await AsyncStorage.setItem('CartList',JSON.stringify([]));
+                    this.sendNotifactionTome("New Order","There is new request from coustmer",JSON.parse(shopData).noti_token)
                     this.setState({islogin:2,avilableItem:[],groceryArrayItem:[]});
                     this._inslization();
                     //  alert("updated slow network");
@@ -347,43 +365,51 @@ export default class CartDetails extends React.Component{
                          
         );
     }
-_storeSelectedShop = async(item)=>{
-   await AsyncStorage.setItem('ShopID',JSON.stringify(item.gro_shop_info_id));
-   this.setState({selectedShop:item});
-   console.log("Sellect Shop :",this.state.selectedShop);
-  // this._inslization();
-}
+
+    _storeSelectedShop = async(item)=>{
+    await AsyncStorage.setItem('ShopID',JSON.stringify(item.gro_shop_info_id));
+    await AsyncStorage.setItem('ShopIDatat',JSON.stringify(item));
+    this.setState({selectedShop:item});
+    console.log("Sellect Shop :",this.state.selectedShop);
+    // this._inslization();
+    }
         //Related shop price 
       
     _renderShop=({item})=>{
                 
         /**
-            {
-                "address": "ABCD",
-                "city": "Beeru",
-                "created_at": "2018-11-14 07:49:22",
-                "gro_shop_info_id": 1,
-                "location": "kfjdkl",
-                "name": "Beeru",
-                "rating": 4,
-                "state": "Bihar",
-                "updated_at": null,
-                "user_id": 1,
-            }
+           {
+         "DCharge": 0,
+         "IsDelivery": 0,
+         "Pin_Code": "812007",
+         "address": "abcd",
+         "city": "bhagalpur",
+         "created_at": "2019-01-13 13:49:35",
+         "gro_shop_info_id": 6,
+         "location": "bnvf",
+         "name": "thomos",
+         "noti_token": "ExponentPushToken[SuD6cxCZBI452wJ37Qnl74]",
+         "pic": "\"\"",
+         "rating": 5,
+         "state": "bihar",
+         "updated_at": null,
+         "user_id": 57,
+         "visiblilty": 1,
+       },
          */
         
         return(
             <TouchableHighlight onPress={()=>{this._storeSelectedShop(item);}}>
             <View style={{padding:5,backgroundColor:"#ffffff"}}>
-                                        <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
-                                        <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >{item.address}</Text>
-                                        <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
-                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{item.rating}</Text>
-                                    <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : {Math.random()} K</Text>
-                                    <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>{item.gro_shop_info_id}</Text>
+                <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
+                <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >{item.address}</Text>
+                <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
+                <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{item.rating}</Text>
+                <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : {Math.random()} K</Text>
+                <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>{item.gro_shop_info_id}</Text>
                                     
-                                        </View> 
-                          <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
+            </View> 
+                <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
             </View>
             </TouchableHighlight>                               
         );
@@ -399,15 +425,19 @@ _storeSelectedShop = async(item)=>{
     
     let Token = await AsyncStorage.getItem('Token');
     let UserID = await AsyncStorage.getItem('UserID');
-    let app = await AsyncStorage.getItem('auth');
+    let profile = await AsyncStorage.getItem('userProfileData');
+   // let app = await AsyncStorage.getItem('auth');
 
     console.log("Token : ",Token);
     console.log("UserID : ",UserID);
-    if(Token == null && UserID == null ){
+    if(Token == null || UserID == null || null == profile ){
+        console.log("Under null")
        this.setState({islogin:0});
     }
     else{
-        this.setState({islogin:1,token:Token,userID:UserID});
+       // console.log(JSON.parse(profile));
+       profile = JSON.parse(profile);
+        this.setState({islogin:1,token:Token,userID:UserID,profile:profile});
     }
     
     this.setState({process:false});
@@ -450,89 +480,95 @@ _storeSelectedShop = async(item)=>{
                                                      
                     </View>
                   
-                <View style={{justifyContent:'space-between',padding:5,backgroundColor:"#f9f9f9"}}>
-                    <View style={{padding:5}}>
-                        <Text> Total Price of Product :5 </Text>
-                    </View>
-                    <View style={{padding:5}}>
-                        <Text> Total Price of Product :5 </Text>
-                    </View>
-                </View>
-
-                <View style={{padding:5,marginTop:3,marginBottom:3, backgroundColor:"#f9f9f9"}}>
-                <Text style={{textAlign:"center",fontSize:20}}>Order Address</Text>
                
-                </View>
+                 <Container>
+                        <Header>
+                            <Title>Your Shipping Address</Title>
+                        </Header>
+                    <Content>
+                   
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input 
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{pincode:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        textContentType='postalCode'
+                        keyboardType='numeric'
+                       
+                        placeholder='Pin Code *'/>
+                    </Item>
 
-                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{houseNo:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                         placeholder='House No.,Building name *'/>
+                        
+                    </Item>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input 
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{city:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        textContentType='postalCode'
+                        placeholder='City *'/>
+                    </Item>
 
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{state:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        textContentType='postalCode'
+                        placeholder='State *'/>
+                        
+                    </Item>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input
+                          onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{name:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                         placeholder='Name *'/>
+                        
+                    </Item>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input 
+                          onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{mobileno:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        keyboardType='numeric'
+                        placeholder='Mobile No. *'/>
+                        
+                    </Item>
                     <View>
-                       <Button onPress={()=>{alert("Location Button Click");}} title="Use my Current Location"/>
+                        <Button title="Save"    onPress={()=>{this.prepareOrder();}}/>
                     </View>
-               
-                </View>
+                    </Content>
+                    
+                </Container>
 
-                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
-
-                    <View>
-                        <Text>Enter Pin Code : </Text>
-                    </View>
-                    <View>
-                        <Text>813209</Text>
-                    </View>
-               
-                </View>
-
-                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
-
-                <View>
-                    <Text>House No.,Building name * : </Text>
-                </View>
-                <View>
-                    <Text>---------</Text>
-                </View>
-
-                </View>
-
-                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9",justifyContent:'space-between'}}>
-
-                <View>
-                    <Text>City : </Text>
-                    <Text>Bhagalpur</Text>
-                </View>
-                <View>
-                    <Text>State</Text>
-                    <Text>Bihar</Text>
-                </View>
-
-                </View>
-
-                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
-
-                    <View>
-                        <Text>Name : </Text>
-                    </View>
-                    <View>
-                        <Text>-------------</Text>
-                    </View>
-               
-                </View>
-
-
-                <View style={{flexDirection:'row',padding:5,backgroundColor:"#f9f9f9"}}>
-
-                    <View>
-                        <Text>Mobile No. : </Text>
-                    </View>
-                    <View>
-                        <Text>+91 9939224274</Text>
-                    </View>
-               
-                </View>
-
-                <View>
-                    <Button title="Save"  onPress={() =>{ this.prepareOrder();} } />
-                </View>
+                
+                   
+              
                 
             </ScrollView>      
        
@@ -739,9 +775,7 @@ _storeSelectedShop = async(item)=>{
     fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
-
-          // " accept": "application/json",
-         //  " accept-encoding": "gzip, deflate",
+            
             "content-type": "application/json",
         },
         body:JSON.stringify( {
@@ -753,7 +787,7 @@ _storeSelectedShop = async(item)=>{
           })
         })
         console.log("Notification send");
-       // alert('Notific send');
+       
 }
 
 
