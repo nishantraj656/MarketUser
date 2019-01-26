@@ -155,25 +155,37 @@ const HomeStack = createStackNavigator(
 // history stack
 const HistoryDetailsStack = createStackNavigator(
     {
-        HistoryDetailsScreen: HistoryDetailsScreen,
+        HistoryDetailsScreen: {
+            screen:HistoryDetailsScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="History Details"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        }
     },
-    {
-        navigationOptions: () => ({
-            header: null,
-        }),
-    }
 );
 
 const HistoryStack = createStackNavigator(
     {
-        HistoryListScreen: HistoryListScreen,
-        HistoryDetailsStack: HistoryDetailsStack,
+        HistoryListScreen:{
+            screen:HistoryListScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="History"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        } ,
+        HistoryDetailsStack: {
+            screen:HistoryDetailsStack,
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }), 
+        }
+
     },
-    {
-        navigationOptions: () => ({
-            header: null,
-        }),
-    }
 );
 
 
@@ -182,6 +194,8 @@ export const ServiceTab = createBottomTabNavigator(
         // Home:HireMeStack,
         Home:HomeStack,
         History:HistoryStack,
+        // History:HistoryDetailsStack,
+
     },
     {
       navigationOptions: ({ navigation }) => ({
@@ -191,7 +205,7 @@ export const ServiceTab = createBottomTabNavigator(
             if(routeName == 'Home'){
                 iconName =`home${focused?'':''}`;
             } else if (routeName === 'History') {
-                iconName = `search${focused ? '' : ''}`;
+                iconName = `repeat${focused ? '' : ''}`;
             }
         
         
@@ -208,7 +222,7 @@ export const ServiceTab = createBottomTabNavigator(
             
         animationEnabled: false,
         swipeEnabled: true,
-        initialRouteName :'Home',
+        initialRouteName :'History',
 
     },   
 );
