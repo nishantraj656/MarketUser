@@ -22,6 +22,7 @@ import CartDetails from '../Cart/Cart';
 import { RestaurantTab } from '../Restaurant/RestaurantTab';
 import { ServiceTab } from '../Service/ServiceTab';
 import Login from '../Login';
+import Test from '../Testing/Test';
 
 
 class MyHomeScreen extends React.Component {
@@ -293,8 +294,11 @@ const CustomDrawerContentComponent = (props) => (
     Login:{
       screen:MyLoginScreen,
     },
+    Test:{
+      screen:Test
+    }
   },{
-    initialRouteName:'Home',
+    initialRouteName:'Test',
     contentComponent:CustomDrawerContentComponent
   });
 
