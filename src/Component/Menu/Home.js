@@ -16,14 +16,20 @@ import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import { Container, Header, Content, Accordion, View, Text } from "native-base";
 import MainCategory from '../../MainCategory/MainCategory';
 import Slider from '../slider/Slider';
+import RecentProductsList from './RecentProductsList';
 
 export default class Home extends React.Component{
     constructor(props){
         super(props)
         this.state={
             obj:this.props.obj,
+            
+            
         }
     }
+
+   
+  
 
     render(){
         return(<Container>
@@ -32,6 +38,8 @@ export default class Home extends React.Component{
                              <MainCategory obj={this.state.obj} />
                         </View>
                          <Slider/>
+                         <RecentProductsList obj={this.state.obj} />
+
                     </Content>
         </Container>)
     }

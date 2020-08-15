@@ -1,97 +1,231 @@
 import React from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, Text, View,Modal,Dimensions,TouchableOpacity} from 'react-native';
+import { Container, Header, Content, Spinner } from 'native-base';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { HomeNavigator } from './Home/HomeNavigator';
-//import {MallNavigator} from './RestaurantShop/MallNavigator';
-/** import Category from '../Category/Category';
-import { ModalNavigator } from '../Category/CategoryMenu';
-import { ModalNavigatorShop } from '../Shop/ShopMenu';
-import CartDetails from '../Cart/Cart';*/
+import Icon from 'react-native-vector-icons/Feather';
 
+import CategoryScreen from './Home/CategoryScreen';
+import HistoryListScreen from './History/HistoryListScreen';
+import HistoryDetailsScreen from './History/HistoryDeatilsScreen';
+import SubCategoryScreen from './Home/SubCategoryScreen';
+import ServiceManProfileScreen from './Home/ServiceManProfileScreen';
+import HireMeScreen from './Home/HireMeScreen';
+import ServiceManListScreen from './Home/ServiceManListScreen';
 
-class HomeScreen extends React.Component {
+// const {width,height} = Dimensions.get('window');
 
-  render() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center',height:500, alignItems: 'center' }}>
-        
-         <Text>Hellojkhkhkhk </Text> 
-        
-      </View>
-    );
-  }
+// const HeaderTitle = (<Text style={{color:"#fff",padding: 10, marginLeft:5, fontSize: 20 , fontWeight:"900",fontSize:20}}>SirG2</Text>);
+// const TitleSubCat = (<Text style={{color:"#fff",padding: 10, marginLeft:5, fontSize: 20 , fontWeight:"900",fontSize:20}}>SirG2</Text>);
+class HeaderTitle extends React.Component{
+    render(){
+        return(
+                <Text style={{
+                        color:"#fff",
+                        padding: 10, 
+                        marginLeft:5, 
+                        fontSize: 20 , 
+                        fontWeight:"900",
+                        fontSize:20
+                    }}>{this.props.title}
+                </Text>
+            )
+    }
+}
+class MenuButton extends React.Component{
+	render(){
+		return(
+			<View style={{backgroundColor:"#2874f0"}}>
+				<TouchableOpacity onPress={() => { this.props.obj.toggleDrawer() } }>
+                    {/* <Icon name="menu" style={{color: 'white', padding: 10, marginLeft:5, fontSize: 35}}/> */}
+                    <Icon name="align-left" style={{color: 'white', padding: 10, marginLeft:5, fontSize: 35}}/>
+				</TouchableOpacity>
+			</View>
+		);
+	}
 }
 
-class ShoppingScreen extends React.Component {
-  render() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Settings!</Text>
-        <Button
-          title="Go to Home"
-          onPress={() => this.props.navigation.navigate('Home')}
-        />
-        <Button
-          title="Go to Details"
-          onPress={() => this.props.navigation.navigate('Details')}
-        />
-      </View>
-    );
-  }
-}
+// Home stack 
+const HireMeStack = createStackNavigator(
+    {
+        HireMeScreen: {
+            screen: HireMeScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="Hire Me"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        } ,
+        BackTOHome: {
+            screen:CategoryScreen,
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }),
+        }
+    },
+);
 
-class CartScreen extends React.Component {
-  render() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Details!</Text>
-      </View>
-    ); 
-  }
-}
+const ServiceManProfileStack = createStackNavigator(
+    {
+        ServiceManProfileScreen: {
+            screen:ServiceManProfileScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="Profile Info"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        },
+        HireMeStack: {
+            screen:HireMeStack,
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }), 
+        }
+    },
+);
+
+
+const ServiceManListStack = createStackNavigator(
+    {
+        ServiceManListScreen: {
+            screen:ServiceManListScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="Choose Your service Man"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        },
+        ServiceManProfileStack: {
+            screen: ServiceManProfileStack,
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }), 
+        }
+    },
+);
+
+const SubCategoryStack = createStackNavigator(
+    {
+        SubCategoryScreen: {
+            screen:SubCategoryScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="Sub Category"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        },
+        ServiceManListStack:{
+            screen: ServiceManListStack,  
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }), 
+        }
+    },
+);
+
+const HomeStack = createStackNavigator(
+    {
+        Home:{
+            screen:CategoryScreen,
+            // navigationOptions: ({ navigation }) => ({
+            //     headerTitle: <HeaderTitle title="Service Manager"/>,
+            //     headerStyle: {
+            //         backgroundColor: '#2874f0'
+            //     },
+            //     headerLeft: <MenuButton obj={navigation}  />,
+            // }),
+            navigationOptions: () => ({
+                header: null,
+            }),
+            
+        } ,
+        SubCategoryStack: {
+            screen:SubCategoryStack,
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }),
+        },
+    },
+);
+
+
+// history stack
+const HistoryDetailsStack = createStackNavigator(
+    {
+        HistoryDetailsScreen: {
+            screen:HistoryDetailsScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="History Details"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        }
+    },
+);
+
+const HistoryStack = createStackNavigator(
+    {
+        HistoryListScreen:{
+            screen:HistoryListScreen,
+            navigationOptions: ({ navigation }) => ({
+                headerTitle: <HeaderTitle title="History"/>,
+                headerStyle: {
+                    backgroundColor: '#2874f0'
+                },
+            }),
+        } ,
+        HistoryDetailsStack: {
+            screen:HistoryDetailsStack,
+            navigationOptions: ({ navigation }) => ({
+                header: null
+            }), 
+        }
+
+    },
+);
 
 
 export const ServiceTab = createBottomTabNavigator(
     {
-        Home:HomeNavigator,
-        Shopping:HomeScreen,
-       // Cart: CartDetails,
-    //  Profile:ProfileScreen,
-    //  "Order History":HistoryScreen,
-      
-        },
-        {
-        navigationOptions: ({ navigation }) => ({
-            tabBarIcon: ({ focused, tintColor }) => {
+        // Home:HireMeStack,
+        Home:HomeStack,
+        History:HistoryStack,
+        // History:HistoryDetailsStack,
+
+    },
+    {
+      navigationOptions: ({ navigation }) => ({
+        tabBarIcon: ({ focused, tintColor }) => {
             const { routeName } = navigation.state;
-            let iconName;
-            if (routeName === 'Shopping') {
-                iconName = `shopping${focused ? '' : ''}`;
-            } else if (routeName === 'Cart') {
-                iconName = `cart${focused ? '' : ''}`;
-            }else if(routeName === 'Profile'){
-                iconName = `account-settings${focused?'':''}`;
-            }else if(routeName == 'Order History'){
-                iconName =`delete${focused?'':''}`;
-            }else if(routeName == 'Home'){
+            let iconName='worker';
+            if(routeName == 'Home'){
                 iconName =`home${focused?'':''}`;
+            } else if (routeName === 'History') {
+                iconName = `repeat${focused ? '' : ''}`;
             }
-    
-            // You can return any component that you like here! We usually use an
-            // icon component from react-native-vector-icons
-            return <Icon name={iconName} size={25} color={tintColor} />;
-            },
-            
+        
+        
+            return <Icon name={iconName} size={30} color={tintColor} style={{fontWeight:'900'}}/>;
+          },
+          
         }),
         tabBarOptions: {
-            activeTintColor: 'tomato',
-            inactiveTintColor: '#ffffff',
-            style:{backgroundColor: '#2714d1'},
+            activeTintColor: '#0087e0',
+            inactiveTintColor: '#747474',
+            style:{backgroundColor: '#fff'},
+            showLabel:false,
         },
-        
+            
         animationEnabled: false,
         swipeEnabled: true,
         initialRouteName :'Home',
-        },   
-  );
+
+    },   
+);
+
+// # 1111114d
+

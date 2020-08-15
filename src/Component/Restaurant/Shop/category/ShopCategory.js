@@ -16,6 +16,7 @@ import {Button,Content,Accordion} from 'native-base';
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
+
 /**This is use to show category  */
      
 
@@ -27,7 +28,7 @@ export default class Category extends React.Component
             data:[],//store data of category items
             process:false,
             obj:this.props.obj,
-            sql:this.props.sql,
+           
             isEmpty:'Wait List is Loading.....',
             checkboxes:[]
 
@@ -46,21 +47,31 @@ export default class Category extends React.Component
        // this._inslized();
     }
 
-    fetech = () =>{
+    fetech = async() =>{
         
-        fetch('http://gomarket.ourgts.com/public/api/gro_category', {
-          method: 'GET',
+        let value = await AsyncStorage.getItem('ShopID')
+        if(value ==null){
+            
+           return; 
+   
+        }
+
+        fetch('http://gomarket.ourgts.com/public/api/Resto/getCatrgory', {
+          method: 'POST',
           headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
-          }
+          },
+          body:JSON.stringify({
+            Shopid:value
+            })
           }).then((response) => response.json())
               .then((responseJson) => {
                 
            //  console.log(responseJson.data);
                 console.log("Category Load .....")
-              this.setState({data:responseJson.data.data}); 
-             this. _addCheckbox();
+             // this.setState({data:responseJson.data.data}); 
+              this. _addCheckbox();
               //console.log("On shop  value :",this.state.data);
             }).catch((error) => {
                   
@@ -74,7 +85,7 @@ export default class Category extends React.Component
   
       }
 
-      
+         
 _addCheckbox() {
 
     let array =this.state.data;
@@ -99,8 +110,17 @@ _addCheckbox() {
     });
 }
 
+
 fetchSub = async(index) =>{
 
+    let shopID = await AsyncStorage.getItem('ShopID')
+       
+    let id = await AsyncStorage.getItem('categoryID')
+    if(value ==null && id == null){
+        
+       return; 
+
+    }
     const {checkboxes} = this.state;
     let value =checkboxes[parseInt(index)].gro_cat_id;
 
@@ -113,15 +133,16 @@ fetchSub = async(index) =>{
         return;
     } 
 
-    await  fetch('http://gomarket.ourgts.com/public/api/gro_subCategory', {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-      },
-      body:JSON.stringify({
-        id:value
-      })
+    await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/sub', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body:JSON.stringify({
+          Shopid:shopID, 
+          id:id
+        })
       }).then((response) => response.json())
           .then((responseJson) => {
             
@@ -145,6 +166,7 @@ fetchSub = async(index) =>{
 
   }
 
+  
 _toggleCheckbox = (index) =>{
     //console.log("Index value ",index);
      const {checkboxes} = this.state;
@@ -159,13 +181,13 @@ _toggleCheckbox = (index) =>{
         try{
             
             await AsyncStorage.setItem('categoryID',JSON.stringify(cID));
-            this.fetchSub(index);
-           // this.state.obj.navigate('SubCategory');
+          
         }catch(error){
             console.log("Category ",error)
         }
     }
 
+    
     /**store data of subcategory */
     _storeSubData=async(subID) =>{
         try{
@@ -180,48 +202,48 @@ _toggleCheckbox = (index) =>{
     //List of category items
     _renderItems =({item})=>
     {
-       console.log(item);
-       let uri;
-       try {
-         item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=item.pic;  
-       } catch (error) {
-           uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0"
-       }
-          //  console.log("Value is ",item.category_id);
-            return(
-                <View>
+        console.log(item);
+        let uri;
+        try {
+          item.pic.length == 0 ? uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0":uri=item.pic;  
+        } catch (error) {
+            uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0"
+        }
+           //  console.log("Value is ",item.category_id);
+             return(
+                 <View>
+                 
+                 <View style={{height:50,backgroundColor:"#fcfdff",flexDirection:'row',justifyContent:'space-between'}}>
+                      
+                       <View style={{alignSelf:'center',height:40,width:50,paddingHorizontal:5,flexDirection:'row'}}>
+                         <Image source={{uri:uri}} style={{height:40,width:50,alignSelf:'center'}}/>
+                       </View> 
+                       <View style={{paddingHorizontal:5 }}>
+                          <Text style={{textAlign:'left'}}>{item.gro_cat_name}</Text> 
+                       </View> 
+                       <TouchableOpacity onPress={()=>{this._storeData(item.gro_cat_id);this.fetchSub(item.index);}}>  
+                      <View style={{padding:5}}> 
+                      <Icon name={item.flag ?"minus":"plus"} size={35}/>
+                     </View> 
+                     </TouchableOpacity> 
+                 </View>
+ 
+                 <FlatList
+                                 data={item.subData}
+                                 renderItem={this._renderSubIteam}
+                                 numColumns={1}
+                                 // keyExtractor={item => item.gro_product_list_id.toString()}
+                                
+                                
+                                ListFooterComponent={()=>{if(this.state.loading) return <View style={{height:20}}><ActivityIndicator size="large" color="#0000ff" /></View>
+                             else return <View></View>}}
+                                
+                                     
+                         />   
+                 </View> 
                 
-                <View style={{height:50,backgroundColor:"#fcfdff",flexDirection:'row',justifyContent:'space-between'}}>
-                     
-                      <View style={{alignSelf:'center',height:40,width:50,paddingHorizontal:5,flexDirection:'row'}}>
-                        <Image source={{uri:uri}} style={{height:40,width:50,alignSelf:'center'}}/>
-                      </View> 
-                      <View style={{paddingHorizontal:5 }}>
-                         <Text style={{textAlign:'left'}}>{item.gro_cat_name}</Text> 
-                      </View> 
-                      <TouchableOpacity onPress={()=>{this._storeData(item.gro_cat_id);this.fetchSub(item.index);}}>  
-                     <View style={{padding:5}}> 
-                     <Icon name={item.flag ?"minus":"plus"} size={35}/>
-                    </View> 
-                    </TouchableOpacity> 
-                </View>
-
-                <FlatList
-                                data={item.subData}
-                                renderItem={this._renderSubIteam}
-                                numColumns={1}
-                                // keyExtractor={item => item.gro_product_list_id.toString()}
-                               
-                               
-                               ListFooterComponent={()=>{if(this.state.loading) return <View style={{height:20}}><ActivityIndicator size="large" color="#0000ff" /></View>
-                            else return <View></View>}}
-                               
-                                    
-                        />   
-                </View> 
-               
-               
-            );
+                
+             );
         }  
 
         _renderSubIteam =({item}) =>{
@@ -256,6 +278,7 @@ _toggleCheckbox = (index) =>{
           </View>
             )
         }
+
     render()
     {
 
@@ -264,7 +287,7 @@ _toggleCheckbox = (index) =>{
         <View style={{marginTop:3,backgroundColor:'#6d1e72'}}><Text style={{color:'#ffffff',fontWeight:'900',fontSize:20,marginHorizontal:5,padding:10}}>Shop By Category</Text></View>
                     
         <FlatList 
-        data={this.state.checkboxes}
+        data={this.state.data}
         renderItem={this._renderItems}
         ItemSeparatorComponent={()=>{return(<View style={{borderRadius:5,borderWidth:0.5,borderBottomColor:'#757575'}}></View>)}}
         ListEmptyComponent={()=>{

@@ -15,12 +15,29 @@ loginController - for store login part
 auth - for store login
 resCartList - restaurant
 ResShopID - selectd Restaurant shopId 
-
+userProfileData - profile data
+cartID - selected CartID
+ShopIDatat - Selected shop information data
+recentProduct - Recent Selected Product 
 6209734084
 
-userToken_MU:user token 
-userID:user id of profile
-userProfileData: profile data
+ /**
+    {
+        "checked": true,
+        "gro_cat_id": 3,
+        "gro_map_id": 2,
+        "gro_price": 85,
+        "gro_product_info": "Product data change ",
+        "gro_product_list_id": 2,
+        "gro_product_name": "Lifebuoy Nature Germ Protection Handwash",
+        "index": 0,
+        "pic": "all_product_pics/personal_care/Lifebuoy Nature Germ Protection Handwash.jpg",
+        "quantity": 750,
+        "quntity": 1,
+        "unit_name": "ML"
+    } 
+    */
+
  
  
  

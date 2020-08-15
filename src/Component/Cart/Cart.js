@@ -3,15 +3,16 @@ import { ToastAndroid,AsyncStorage,Text,ImageBackground,Image, View,Button,FlatL
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { CartRemoveItem } from './ListPrepare';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import Login from '../Login';
-//import { listReturn } from './ListPrepare';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Container, Header, Content, Item, Input, Title} from 'native-base';
+
+// import Login from '../Login';
+// import { listReturn } from './ListPrepare';
 
 const quer2=null;
 
-
 export default class CartDetails extends React.Component{
-
+    
     constructor(props){
         super(props)
         this.state={
@@ -22,7 +23,7 @@ export default class CartDetails extends React.Component{
             sumvalue:'0', //total price of selected shop
             fullData:[], // all data of cart with complete data
             avilableShop:[],    // list of all shop 
-            selectedShop: {
+            selectedShop:{},/** {
                                 "address": "ABCD",
                                 "city": "Beeru",
                                 "created_at": "2018-11-14 07:49:22",
@@ -30,14 +31,13 @@ export default class CartDetails extends React.Component{
                                 "location": "kfjdkl",
                                 "name": "Beeru",
                                 "rating": 4,
-                                "state": "Bihar",
-                                
+                                "state": "Bihar", 
                                 "user_id": 1
-                            },  // id of current selected shop  
+                            } */
             userID:'1', //user id   
             cartID:'0', //cart id   
             shopID:'1', //shopID
-            islogin:false,  
+            islogin:2,  
             refreshing:false,
             isEmpty:"Wait List is Loading.....", //message to show while loading 
             cartItem:0, //No. of item in cart    
@@ -46,14 +46,25 @@ export default class CartDetails extends React.Component{
             obj:this.props.obj, 
             imgPath:'http://gomarket.ourgts.com/public/',
             GrocerySelectedProduct:[], //Selected Grocery Product
-            GroceryShop:[] //Selected Grocery Product
+            GroceryShop:[], //Selected Grocery Product
+            groceryArrayItem:[],//selectedArray
+           token:'',
+           profile:{},
+           OrderAddress:{
+               houseNo:23,
+               pincode:889345,
+               city:'Bhagalpur',
+               state:'Bihar',
+               name:'',
+               mobileno:'+91 9939224274'
+           }
         }
-       // this.conn =new Connection();
-       
+
     }
 
 
     componentDidMount(){
+
        this._inslization();
        this.fetechShopList();
        
@@ -74,9 +85,8 @@ export default class CartDetails extends React.Component{
             }).then((response) => response.json())
                 .then((responseJson) => {
                 
-               // console.log("Shop List Load ......",responseJson);
-              this.setState({GroceryShop:responseJson.data.data,isEmpty:"List is empty..."}); 
-            //  console.log("On shop  value :", value);
+         this.setState({GroceryShop:responseJson.data.data,isEmpty:"List is empty..."}); 
+              console.log("On shop  value :", responseJson);
             }).catch((error) => {
                     
                 //  alert("updated slow network");
@@ -100,7 +110,7 @@ export default class CartDetails extends React.Component{
    
         }
       
-        console.log("Pass value for price ",this.state.GrocerySelectedProduct)
+      //  console.log("Pass value for price ",this.state.GrocerySelectedProduct)
         
         await  fetch('http://gomarket.ourgts.com/public/api/Grocery/Shop/product/price', {
             method: 'POST',
@@ -115,7 +125,7 @@ export default class CartDetails extends React.Component{
             }).then((response) => response.json())
                 .then((responseJson) => {
                 
-                console.log("PriceList Load......",responseJson);
+                //console.log("PriceList Load......",responseJson);
               this.setState({avilableItem:responseJson.data,isEmpty:"List is empty..."});
               this.setState({priceTopay:responseJson.price})
               
@@ -132,40 +142,95 @@ export default class CartDetails extends React.Component{
 
     }
 
+                /** call for order */
+    prepareOrder = async()=>{
 
-/** 
-      // It will add the list to the cart with item number 
-    _storeDataForCart = async () => {
-        try {
+        /**Object {
+   "0": Object {
+     "address": "Your Address",
+     "city": "Bhagalpur",
+     "cname": "Your Name",
+     "cpin": 812001,
+     "customer_info_id": 2,
+     "location": "location",
+     "pic": "",
+     "state": "Bihar",
+     "user_id": 63,
+   },
+   "address": "Your Address",
+   "city": "Bhagalpur",
+   "cname": "Your Name",
+   "cpin": 812001,
+   "customer_info_id": 2,
+   "location": "location",
+   "pic": "",
+   "state": "Bihar",
+   "user_id": 63,
+ } */
 
-         // await AsyncStorage.removeItem('List');
-          
-        let data =await AsyncStorage.getItem('List');
 
-      
-        const chooseValue = await AsyncStorage.getItem('chooseItem'); 
         
-         let q = '#productID:'+chooseValue+",ShopID:"+this.state.data.shop_id+",Quntity:"+1+',Unit:'+this.state.data.unit+",Price:"+this.state.data.price;
-        console.log(q);
-        data =data+ q;
 
-        const id = await AsyncStorage.getItem('ItemInCart');
-        const l = parseInt(id,10)+1;
-        await AsyncStorage.setItem('ItemInCart',l.toString());
-      await AsyncStorage.setItem('List',data);
-      // await AsyncStorage.mergeItem('List', JSON.stringify(UID123_del));
-
-        console.log(":Items in cart  :"+await AsyncStorage.getItem('List'));
-        ToastAndroid.show('Add to cart !', ToastAndroid.SHORT);
-
-        console.log("List of data \n\n\n",data);
-        
-        } catch (error) {
-        // Error saving data
-        console.log("Error in store data beta ",error);
+        let value = await AsyncStorage.getItem('ShopID');
+        let shopData = await AsyncStorage.getItem('ShopIDatat');
+        if(value ==null || shopData == null){
+           return; 
         }
+       
+       // console.log("Uder Prepare :",JSON.parse(shopData).noti_token);
+        
+    
+       for(var i =0;i<this.state.avilableItem.length;i++){
+        var dumpArray = {
+            "map_id":this.state.avilableItem[i].gro_map_id,
+            "qua":this.state.avilableItem[i].Quantity,
+            "real_Price":this.state.avilableItem[i].gro_price,
+             "offer_price":this.state.avilableItem[i].offer,
+             "gro_product_shop_id":this.state.avilableItem[i].gro_product_shop_id  
+            };
+            this.state.groceryArrayItem.push(dumpArray);
+       }
+       console.log("after Prepared Array :",this.state.groceryArrayItem.length);
+      
+        await  fetch('http://gomarket.ourgts.com/public/api/gro_order', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':'Bearer '+this.state.token,
+            },
+            body:JSON.stringify({
+                real_Price:this.state.priceTopay,
+                Offer_Price:this.state.offerAmt,
+                paid_amt:(0),
+                customerID:this.state.profile.customer_info_id,
+                Order_address:"Name : "+this.state.OrderAddress.name+" ,Address :- "+this.state.OrderAddress.houseNo+" , "+
+                        this.state.OrderAddress.city+" , "+this.state.OrderAddress.state +" , "+this.state.OrderAddress.pincode,
+                gro_shop_ID:JSON.parse(value),
+                Item:this.state.groceryArrayItem
+                })
+            }).then((response) => response.json())
+                .then(async(responseJson) => {
+                    alert("Order Placed");
+                    await AsyncStorage.setItem('CartList',JSON.stringify([]));
+                    this.sendNotifactionTome("New Order","There is new request from coustmer",JSON.parse(shopData).noti_token)
+                    this.setState({islogin:2,avilableItem:[],groceryArrayItem:[]});
+                    this._inslization();
+                    //  alert("updated slow network");
+                    // console.log("Erro during Price fetech", error.message);
+           
+            }).catch(async(error) => {
+                
+               
+                 log.error({error:err})
+                //   value.flag=false;
+                //   value.data = "Network request failed" ==error.message?  console.log("Check internet connection"):error;
+    
+                }); 
+
+
     }
-*/
+
         //It will refresh the 
     refresh =async()=>{
         try{
@@ -186,83 +251,6 @@ export default class CartDetails extends React.Component{
     }
 
 
-    /** It will create query for database 
-    DataCreater = async () => {
-
-        let fullAray=[]
-        let cart = await AsyncStorage.getItem('List');
-        
-        if(cart==null)
-            return;
-
-        let obj =JSON.parse(cart);
-      
-        await AsyncStorage.setItem("ItemInCart",obj.length.toString());
-        
-        await this.dublicateControl(obj);
-         
-          /** Preparing query  
-          let arrayData= this.state.fullData; 
-     
-        // if(arrayData.length == 0){
-        //     return;
-        // }
-   
-           
-
-            
-        arrayData.forEach(function(element){
-            
-           
-               
-            if(quer2===null){
-               
-                 quer2 = 'product_table.p_list_id ='+element.PListID;       
-            }
-            else{
-                
-                quer2 = quer2 + ' OR product_table.p_list_id = '+element.PListID;
-            }
-
-           
-                
-
-            })
-           
-        
-     
-       
-      await this.fireForSelectShop();
-     
-    }
-    
-    // Remove dublicate data
-    dublicateControl = async(fullArray) =>{
-                let freshArray=[];
-                
-             //   console.log('------------------------------------------------------------------------------------------------------------------------------------');
-                console.log("In dublicasi ",fullArray);
-                fullArray.forEach(function(element){
-                  //  console.log("element 1 >>> ",element);
-                    let flag=0;
-                    freshArray.forEach(function(element2){
-                       // console.log("element 2",element2.productID);
-                        if(element.PListID == element2.PListID){
-                            flag=1;
-                            element2.Quntity = (parseInt(element2.Quntity,10) + parseInt(element.Quntity,10)).toString();
-                          //  console.log("Element quntity ",element2.Quntity);
-                       }
-                    });
-                    if(flag == 0){
-                        freshArray.push(element);
-                    }
-
-                });
-             //   console.log("In dublicate fresh array ",freshArray);
-                await this.setState({fullData:freshArray});
-
-    }
-*/
     
 
         // 
@@ -271,7 +259,8 @@ export default class CartDetails extends React.Component{
            
             let shopID=await AsyncStorage.getItem('ShopID');
             let CartList = await AsyncStorage.getItem('CartList');
-            if(shopID == null && CartList == null)
+    
+            if(shopID == null && CartList == null )
                 return;
             CartList = JSON.parse(CartList);
            this.setState({GrocerySelectedProduct:CartList});
@@ -279,180 +268,13 @@ export default class CartDetails extends React.Component{
            
         }catch(error){
             //error part
-            this.setState({isEmpty:'Somthing wrong click on Re-fresh'})
+            this.setState({isEmpty:'Somthing wrong click on Re-fresh'});
             console.log("Error in add cart ",error);
             alert("Error")
             
         }    
     }
 
-/** 
-              //fire command for query in database for item value 
-    fireForSelectShop =async () =>{
-                    try{
-                        let shopid = this.state.selectedShopID;
-                    
-                           let quer1 ='select product_table.*,product_list_table.pic_1,product_list_table.p_name,product_list_table.manufacture_id from product_table INNER join product_list_table on product_table.p_list_id = product_list_table.p_list_id  where ( '
-                           
-                           let quer3 = ') AND shop_id =' + shopid;
-                         
-                        console.log(quer1+quer2+quer3);
-                      let value= await this.conn.Query(quer1+quer2+quer3);
-                      if(value.flag){
-                        this.setState({data:value.data}); 
-                      //  console.log(this.state.data);  
-                        this.calculate(); 
-                    }
-                      
-
-                    }catch(error){
-
-                    }
-             
-             }
-
-              //fire command for query in database for current selected shop
-    fireForCurrentShop =async () =>{
-                
-                let query = "SELECT shop_info_table.*,security_table.* FROM `shop_info_table` INNER JOIN security_table ON shop_info_table.user_id = security_table.user_id WHERE shop_info_table.shop_info_id = "+this.state.selectedShopID;
-                console.log("Shop Query :",query);
-
-                let value= await this.conn.Query(query);
-                if(value.flag){
-                  this.setState({datashop:value.data}); 
-                //  console.log(this.state.data);  
-                  this.render(); 
-              }
-       
-               }
-
-    
-              //fire command for query in database for current selected shop offer
-        fireForCurrentShopOffer =async () =>{
-                
-                let query = "Select * from offer_table where shop_id ="+this.state.selectedShopID+" AND `status` = 'true' ORDER BY created_at DESC LIMIT 1";
-                console.log("Shop Query :",query);
-
-                let value= await this.conn.Query(query);
-                if(value.flag){
-                 
-              
-                try {
-                    this.setState({offerAmt:value.data[0].discount})
-                } catch (error) {
-                    this.setState({offerAmt:'0'})
-                }  
-                  this.render(); 
-              }
-       
-        }
-
-               //It will get remaning shop id value
-    FireForRemaningShop =async () =>{
-                    this.setState({refreshing:true});
-                    let query = "select * from shop_info_table where shop_info_id != "+this.state.selectedShopID;
-                    console.log("Shop Query :",query);
-    
-                    let value= await this.conn.Query(query);
-                    if(value.flag){
-                      this.setState({avilableShop:value.data}); 
-                    //  console.log(this.state.data);  
-                      this.render(); 
-                  }          
-                }
-        // fire for CartID 
-    firecartID =async (query) =>{
-            
-                this.setState({refreshing:true});
-                console.log(query);  
-                await  fetch('http://biharilegends.com/biharilegends.com/market_go/run_query.php', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    query: query,
-                }) 
-                }).then((response) => response.json())
-                    .then((responseJson) => {
-                  //  console.log("On Cart Value "+ typeof responseJson[0].m);
-                        this.setState({cartID:responseJson[0].m});
-                        this.setState({refreshing:false});
-                        
-                        return responseJson[0].m;
-                    
-                    }).catch((error) => {
-                        alert("updated slow network");
-                        console.log(error);
-                        this.setState({refreshing:false});
-        
-                    });           
-            }  
-            
-            //fire insert query
-    fireInsert =async (query) =>{
-
-        let flag ='N';
-                console.log(query);
-                await  fetch('http://biharilegends.com/biharilegends.com/market_go/run_query.php', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    query: query,
-                }) 
-                }).then((response) => response.json())
-                    .then((responseJson) => {
-                    
-                    
-                   // alert("Insert");
-                   // console.log("In insert data ",responseJson[0]);
-                   responseJson[0] =='Y' ? flag=1 :flag=0;
-
-               }).catch((error) => {
-                        alert("updated slow network");
-                        console.log(error);
-                        this.state({process:false});
-                        
-        
-                    }); 
-                    return(flag);            
-            }  
-
-            /** Remove item from list if required 
-    _removeItem = async(item)=>{
-
-       // console.log(" XXXXXXXXXXXXX ",item);
-        try{
-
-        
-        let tempArray = [];
-
-        this.state.fullData.forEach(function(element){
-            if(element.PListID != item.PListID)
-           {
-              tempArray.push(element); 
-              ToastAndroid.show('Item Remove !', ToastAndroid.SHORT);
-              console.log(" PUSH ",element)
-           }
-           else{
-               console.log("NOT PUSH ",element)
-           }
-        });
-       // console.log(" ######### ",tempArray);
-        await AsyncStorage.setItem('List',JSON.stringify(tempArray));
-        
-        this.refresh();
-    }catch(error){
-        console.log(error)
-    }
-
-    }
-       */ 
-    
         //Selected item list 
     _renderIteam=({item})=>{
        // console.log(item);
@@ -522,11 +344,10 @@ export default class CartDetails extends React.Component{
                 "unit_name": "g",
                 }
       */
-        //  let price =this.state.priceTopay +item.price;
-        // this.setState({priceTopay:price});
+       
+           
         return(
-                 
-               
+
                <View style={ { backgroundColor:'#ffffff',borderBottomWidth:0.2,justifyContent:'space-between',flexDirection:'row'}}>
                         <View style={{alignItems:'center',width:'25%',padding:3,margin:5,}} >
                         <Text style={{fontSize:15}}> {item.gro_product_name}</Text>
@@ -544,41 +365,51 @@ export default class CartDetails extends React.Component{
                          
         );
     }
-_storeSelectedShop = async(item)=>{
-   await AsyncStorage.setItem('ShopID',JSON.stringify(item.gro_shop_info_id));
-   this.setState({selectedShop:item});
-   this._inslization();
-}
+
+    _storeSelectedShop = async(item)=>{
+    await AsyncStorage.setItem('ShopID',JSON.stringify(item.gro_shop_info_id));
+    await AsyncStorage.setItem('ShopIDatat',JSON.stringify(item));
+    this.setState({selectedShop:item});
+    console.log("Sellect Shop :",this.state.selectedShop);
+    // this._inslization();
+    }
         //Related shop price 
       
     _renderShop=({item})=>{
                 
         /**
-            {
-                "address": "ABCD",
-                "city": "Beeru",
-                "created_at": "2018-11-14 07:49:22",
-                "gro_shop_info_id": 1,
-                "location": "kfjdkl",
-                "name": "Beeru",
-                "rating": 4,
-                "state": "Bihar",
-                "updated_at": null,
-                "user_id": 1,
-            }
+           {
+         "DCharge": 0,
+         "IsDelivery": 0,
+         "Pin_Code": "812007",
+         "address": "abcd",
+         "city": "bhagalpur",
+         "created_at": "2019-01-13 13:49:35",
+         "gro_shop_info_id": 6,
+         "location": "bnvf",
+         "name": "thomos",
+         "noti_token": "ExponentPushToken[SuD6cxCZBI452wJ37Qnl74]",
+         "pic": "\"\"",
+         "rating": 5,
+         "state": "bihar",
+         "updated_at": null,
+         "user_id": 57,
+         "visiblilty": 1,
+       },
          */
         
         return(
             <TouchableHighlight onPress={()=>{this._storeSelectedShop(item);}}>
             <View style={{padding:5,backgroundColor:"#ffffff"}}>
-                                        <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
-                                        <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >{item.address}</Text>
-                                        <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
-                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{item.rating}</Text>
-                                    <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : {Math.random()} K</Text>
+                <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{item.name}</Text>
+                <Text style={{fontSize:15,padding:10,fontWeight:'400',alignSelf:'center',textShadowColor:'#0815cc',color:'#560040'}} >{item.address}</Text>
+                <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
+                <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{item.rating}</Text>
+                <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : {Math.random()} K</Text>
+                <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>{item.gro_shop_info_id}</Text>
                                     
-                                        </View> 
-                          <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
+            </View> 
+                <Text style={{alignSelf:'center',color:'#6d6d6d'}}> To shop from this shop click Now</Text>
             </View>
             </TouchableHighlight>                               
         );
@@ -587,103 +418,163 @@ _storeSelectedShop = async(item)=>{
 
     //done thish will place order
     _DoneButton= async()=>{
-
+        if(this.state.avilableItem.length==0){
+            return;
+        }
         this.setState({process:true});
     
     let Token = await AsyncStorage.getItem('Token');
     let UserID = await AsyncStorage.getItem('UserID');
-    let app = await AsyncStorage.getItem('auth');
+    let profile = await AsyncStorage.getItem('userProfileData');
+   // let app = await AsyncStorage.getItem('auth');
 
-    if(Token == null && UserID == null ){
-       this.setState({islogin:true});
+    console.log("Token : ",Token);
+    console.log("UserID : ",UserID);
+    if(Token == null || UserID == null || null == profile ){
+        console.log("Under null")
+       this.setState({islogin:0});
     }
-   
+    else{
+       // console.log(JSON.parse(profile));
+       profile = JSON.parse(profile);
+        this.setState({islogin:1,token:Token,userID:UserID,profile:profile});
+    }
+    
     this.setState({process:false});
-    console.log(" List Prepare : ",this.state.avilableItem);
-      
-                  /**       let shopID = this.state.selectedShopID;
-                        let cinsert = "INSERT INTO `cart_lot_table`(customer_info_id,offer_amt,paid_amt,total_price,shop_info_id) VALUES ("+userID+',0,0,'+this.state.priceTopay+','+shopID+');';
-                            // if(!this.fireInsert(cinsert)){
-                            //     return;
-                            // }
-                            if(!await this.fireInsert(cinsert)){
-                                
-                                alert("Order fail check internet connection and retry");
-                                this.setState({process:false})
-                                 return;
-                             }
-                         await this.firecartID('SELECT MAX(cart_lot_no) as m from cart_lot_table where `customer_info_id`='+userID);
-                          let cartID =this.state.cartID;
-                          let fullQuery ='';
-                       //   console.log("Cart Id",this.state.avilableItem);
-                         await this.state.avilableItem.forEach(function(element){
-                           //  console.log(element,element.productID);
-                              let q1= " INSERT INTO `order_table`(`custumber_id`, `product_list_id`, `cart_lot_no_id`,`order_status`,`quantity`,oPrice) VALUES( "
-                            let q2 = userID+","+element.productID+","+cartID+",0,"+element.Quntity+","+element.Price+" ); ";
-                            fullQuery = fullQuery + q1+q2;
-                            });
-                           //console.log("Full query :"+fullQuery);
-                        
-                        if(!await this.fireInsert(fullQuery)){
-                            alert("Order fail check internet connection and retry");
-                            this.setState({process:false})
-                             return;
-                         }
-                         else{
-                            alert("Your order successfully sent to the shopkeeper collect it ……");
-                            await AsyncStorage.setItem('ItemInCart', '0');
-                            await AsyncStorage.setItem('List',"");
-                        
-                            this.refresh();
-                            this.setState({process:false}); 
-                            this.sendNotifactionTome("New Order","New order of total price : "+this.state.priceTopay +" From customer.",this.state.datashop[0].noti_token);
-                            this.setState({avilableItem:[],priceTopay:'0',sumvalue:'0'});
-                         }*/
    
+      
+  }
 
-    }
 
-   /** it will calculate the price of avilable product
-    calculate = async()=>{
-           // console.log("In calculate");
-            let price = 0;
-            let array = this.state.fullData;
-            let array2 = this.state.data;
-            let avilableArray =[];
-
-            // console.log("Full array calcu ",array);
-            // console.log("Array 2 data ",array2);
-
-            array2.forEach(function(element){ 
-             //   console.log('-------',element);
-                array.forEach(function(element2){
-               //    console.log('>>>>>>>',element2);
-                if(element.p_list_id == element2.PListID){
-                    let ele =element2;
-                  //  console.log("In element 2 :", element.product_table_id);
-                   price = price + element.price * element2.Quntity;
-                   ele.Price = element.price * element2.Quntity;
-                   ele["Pname"] = element.p_name;
-                  
-                   avilableArray.push(ele);
-                }
-
-                });
-                 
-              
-             });
-            // console.log("Total price of the product ",price);
-            //  this.setState({sumvalue:price});
-             let priceTopay = (price - ((this.state.offerAmt/100) * price)).toFixed(0);
-             this.setState({avilableItem:avilableArray,sumvalue:price,priceTopay:priceTopay});
-           //  console.log("/////--------------",this.state.avilableItem);
-        }*/
 
     render(){
-       if(this.state.islogin){
+       if(this.state.islogin == 0){
         return  this.state.obj.navigate('Login');        
-       }           
-    else         
+       }
+       else if(this.state.islogin == 1)
+            return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
+                  
+                <ScrollView>
+                    <View style={{backgroundColor:"#f9f9f9",padding:5,justifyContent:'center'}}>
+
+                        <View style={{flex:0.5,backgroundColor:"#f9f9f9",marginBottom:5,flexDirection:'row',justifyContent:'center'}}>
+                        <View style={{height:150,width:150,padding:5}}>
+                        <ImageBackground source={{uri: 'http://www.picaframehsv.com/wp-content/uploads/2014/08/banner.jpg'}} style={{height:"100%",width:"100%"}} />
+                        </View>   
+                        <View style={{height:150,width:150,padding:5}}>
+                        <ImageBackground source={{uri: 'http://www.picaframehsv.com/wp-content/uploads/2014/08/banner.jpg'}} style={{height:"100%",width:"100%"}} />
+                        </View> 
+                        </View> 
+                          <View style={{flex:1}}>
+                                        <Text style={{fontSize:20,fontWeight:'900',alignSelf:'center',textShadowColor:'#0815cc',color:'#000656'}} >{this.state.selectedShop.name }</Text>
+                                        <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Address : {this.state.selectedShop.address }</Text>
+                                      {/**  <Text style={{fontSize:15,padding:1,fontWeight:'400',textShadowColor:'#0815cc',color:'#adadad'}} >Mobile No. :{this.state.datashop !=null? this.state.datashop[0].phone_no:"There is no data" }</Text> */}
+                                        
+                                        <View style={{flexDirection:'row',justifyContent:'space-between',padding:5}}>
+                                        <Text style={{fontSize:20,backgroundColor:'#002d11', fontWeight:'900',alignSelf:'flex-end',paddingHorizontal:10,color:'#ffffff'}}>*{this.state.selectedShop.rating}</Text>
+                                    <Text style={{fontSize:15,fontWeight:'400',alignSelf:'center',padding:10,color:'#6d6d6d',}}>Rating : 908,56</Text>
+                                    
+                            </View> 
+                           
+                        </View>   
+                                                     
+                    </View>
+                  
+               
+                 <Container>
+                        <Header>
+                            <Title>Your Shipping Address</Title>
+                        </Header>
+                    <Content>
+                   
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input 
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{pincode:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        textContentType='postalCode'
+                        keyboardType='numeric'
+                       
+                        placeholder='Pin Code *'/>
+                    </Item>
+
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{houseNo:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                         placeholder='House No.,Building name *'/>
+                        
+                    </Item>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input 
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{city:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        textContentType='postalCode'
+                        placeholder='City *'/>
+                    </Item>
+
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input
+                        onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{state:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        textContentType='postalCode'
+                        placeholder='State *'/>
+                        
+                    </Item>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input
+                          onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{name:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                         placeholder='Name *'/>
+                        
+                    </Item>
+                    <Item>
+                        <Icon active name='home' size={20}/>
+                        <Input 
+                          onChangeText={(text) => {
+                           
+                            this.setState({OrderAddress:{mobileno:text}})
+                        }}
+                        placeholderTextColor='#a8afa9'
+                        keyboardType='numeric'
+                        placeholder='Mobile No. *'/>
+                        
+                    </Item>
+                    <View>
+                        <Button title="Save"    onPress={()=>{this.prepareOrder();}}/>
+                    </View>
+                    </Content>
+                    
+                </Container>
+
+                
+                   
+              
+                
+            </ScrollView>      
+       
+        </View>
+          );           
+    else if(this.state.islogin == 2)        
       return(<View style={{flex:1,backgroundColor:'#d8d8d8'}}>
                   
             <ScrollView>
@@ -833,6 +724,7 @@ _storeSelectedShop = async(item)=>{
 
 
          </View>
+
          <View style={{padding:10,backgroundColor:'#071a84',marginTop:10}}>
                     <Text style={{color:'#fcfcfc',fontStyle:'italic',fontSize:20,}}> Price of the same item on other shop.</Text>
 
@@ -874,6 +766,8 @@ _storeSelectedShop = async(item)=>{
           )       
     }
 
+    
+
         //database connection 
   sendNotifactionTome = (title,msg,token) =>{
    
@@ -881,9 +775,7 @@ _storeSelectedShop = async(item)=>{
     fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
-
-          // " accept": "application/json",
-         //  " accept-encoding": "gzip, deflate",
+            
             "content-type": "application/json",
         },
         body:JSON.stringify( {
@@ -895,7 +787,7 @@ _storeSelectedShop = async(item)=>{
           })
         })
         console.log("Notification send");
-       // alert('Notific send');
+       
 }
 
 

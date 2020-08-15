@@ -19,19 +19,13 @@ import {
             
         } from 'react-native';
 
-
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
-
 //import { ProductListing } from '../Cart/ListPrepare';
-import { SearchBar } from 'react-native-elements'
-//import Search from '../../Global/Search';
-import { TextInput } from 'react-native-gesture-handler';
-import { CartPrepare } from '../../Cart/ListPrepare';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { SearchBar } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 
-export default class ShopsProductsList extends React.Component
+export default class RecentProductsList extends React.Component
 {
     constructor(props){
         super(props);
@@ -50,22 +44,76 @@ export default class ShopsProductsList extends React.Component
           isData:true,
           imgPath:'http://gomarket.ourgts.com/public/',
           checkboxes:[],
-            
+          userID:'',
+          token:'',
+          profile:'',
+
         }
         
         
     }
 
-    // _onEndReached=()=>{
-    //     console.log("Calling the end rich");
-    //     if(this.state.isData)
-    //    this._inslized();
-    // }
+
 
     componentDidMount(){
        // console.log(this.state.sql);
-       this.fetech();
+      
+       this._retrieveData();
       //  this._inslized();
+    }
+
+    _retrieveData = async () => {
+        try {
+          let token = await AsyncStorage.getItem('Token');
+          let userID = await AsyncStorage.getItem('UserID');
+          let profile = await AsyncStorage.getItem('userProfileData');
+            if ( userID == null || token == null ||profile == null) {
+
+                // We have data!!         
+                console.log("We have not any data ");
+            }
+            else{  
+                profile = JSON.parse(profile);        
+                this.setState({userID:userID,token:token,profile:profile})
+                this.fetchOrder();
+                console.log("Else wale ho beta ",profile);
+            }
+         } catch (error) {
+           // Error retrieving data
+           console.log("Error he re baba :: ",error);
+         }
+         
+      }
+
+        /** call for order */
+    fetchOrder = async()=>{
+       
+        await  fetch('http://gomarket.ourgts.com/public/api/Recent', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':'Bearer '+this.state.token
+            },
+            body:JSON.stringify({
+                userID:24//this.state.profile.customer_info_id
+                })
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    
+                //    this.setState({data:responseJson.data});             
+                    console.log("Load recent.........",responseJson);
+                this.setState({data:responseJson.data,isEmpty:"List is empty...",loading:false}) 
+                this._addCheckbox();
+                   
+            }).catch((error) => {
+                
+               
+                 console.log("Error in fetech",error)
+                
+                }); 
+                console.log("We have in  ");
+
     }
 
     fetech = async() =>{
@@ -108,7 +156,7 @@ export default class ShopsProductsList extends React.Component
 
     }
 
-    _inslized=async()=>{ 
+    _inslized1 =async()=>{ 
     
         this.setState({loading:true})
        let value =await this.conn.Query(this.state.sql+" Limit 10");
@@ -202,29 +250,32 @@ _toggleCheckbox =(index) =>{
 _renderIteam=({item})=>{
         
   //  console.log("Product ---",item );
-  /**{
-        "checked": true,
+  /** Object {
+        "created_at": "2019-01-14 18:11:12",
+        "gro_cart_id": 25,
         "gro_cat_id": 3,
-        "gro_map_id": 2,
-        "gro_price": 85,
+        "gro_map_id": 3,
+        "gro_order_id": 90,
         "gro_product_info": "Product data change ",
-        "gro_product_list_id": 2,
-        "gro_product_name": "Lifebuoy Nature Germ Protection Handwash",
-        "index": 0,
-        "pic": "all_product_pics/personal_care/Lifebuoy Nature Germ Protection Handwash.jpg",
+        "gro_product_list_id": 3,
+        "gro_product_name": "Dabur Red Toothpaste",
+        "gro_product_shop_id": null,
+        "gro_quantity": 2,
+        "offer_price": 0,
+        "order_status": 0,
+        "pic": "all_product_pics/personal_care/Dabur Red Toothpaste.jpg",
         "quantity": 750,
-        "quntity": 1,
-        "unit_name": "ML"
-    }*/
+        "real_price": 99,
+      },*/
  
     
     let pName = item.gro_product_name;
     let sName = item.gro_product_name;
     let PID = item.gro_product_list_id;
     let sID = 2;
-    let unit = item.unit_name;
-    let price = item.gro_price;
-    let Qun = item.quntity;
+   // let unit = item.unit_name;
+   // let price = item.gro_price;
+    let Qun = item.gro_quantity;
     let pListID =4;
     let uri;
     
@@ -233,16 +284,17 @@ _renderIteam=({item})=>{
     } catch (error) {
         uri="https://pvsmt99345.i.lithium.com/t5/image/serverpage/image-id/10546i3DAC5A5993C8BC8C?v=1.0"
     }
-  //  console.log(uri);
+  //  console.log(uri); {unit}
     return(
         
             <View style={{ flex:1,
                             backgroundColor:'#fcfcfc', 
                             padding:5,
-                            flexDirection:"row",
-                            height:150, 
+                            width:150,
+                            height:250, 
                             borderWidth:0.5,
-                            borderColor:'#cecece'
+                            borderColor:'#cecece',
+                            borderRadius:1
                             }}>
 
                   
@@ -255,51 +307,19 @@ _renderIteam=({item})=>{
 
                 <TouchableOpacity onPress={()=>{this._storeData(item)}}>
               
-                 <View style={{alignItems:'center', justifyContent:'center',padding:3,flexDirection:'row'}}>
+                 <View style={{alignItems:'center', justifyContent:'center',padding:3}}>
                     <Text style={{fontSize:14,fontWeight:'300'}}>{pName} {PID}</Text>
                 </View>
 
-                <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                <Text style={{fontSize:14,fontWeight:'900'}}>Price: <Icon name={'currency-inr'} size={15}/> {price} {unit}</Text>
-                </View>
+                {/**<View style={{justifyContent:'space-around',flexDirection:'row'}}>
+                <Text style={{fontSize:14,fontWeight:'900'}}>Price: <Icon name={'currency-inr'} size={15}/> {price} </Text>
+                </View> */}
             
-                <View style={{justifyContent:'space-around',flexDirection:'row'}}>
-                <Text style={{fontSize:15,fontWeight:'900',paddingHorizontal:7,color:'#fcfcfc',backgroundColor:'#02490b'}}>*3.5</Text>
-                <Text style={{fontSize:15,fontWeight:'400',paddingHorizontal:7,color:'#878787',}}>Rating 1,657</Text>
-                </View>
+               
               </TouchableOpacity>
                
-                <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,height:50,paddingBottom:5}}>
-                    <View style={{borderWidth:1}}>
-                        <Picker
-                            selectedValue={this.state.weight}
-                            style={{  width: 100 }}
-                            onValueChange={(itemValue, itemIndex) => this.setState({language: weight})}>
-                            <Picker.Item label="1 Kg" value="1" />
-                         </Picker>
-                    </View> 
-
-                     {item.checked ?
-                <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,height:50,paddingBottom:5}}>
-                    <Button title=" Add Item + " onPress={this._toggleCheckbox.bind(this, item.index)}/>
-                </View>
-                :
-
-                    <View style={{borderWidth:1,height:50,flexDirection:'row',paddingBottom:5}}>
-                    <Button title=' - '  onPress={this._subQuantity.bind(this,item.index)}/>
-                    <TouchableOpacity onPress={()=>{}}>
-                    <View style={{width:50,height:50,paddingBottom:5}}><Text style={{fontSize:20,alignSelf:'center'}}>{Qun}</Text></View>
-                    </TouchableOpacity>
-                    <Button title=' + ' onPress={this._addQuantity.bind(this,item.index)}/>
-                       
-
-                    </View>
-               }
-                </View>
-               
-                </View>
             </View>
-        
+        </View>
         
                
                     
@@ -368,17 +388,14 @@ _renderIteam=({item})=>{
 
     render(){
         
-        //this._retrieveData();
-    // console.log("From state  ",this.state.data);
+       if(this.state.checkboxes.length==0)
+        return<View></View>
+        else
         return(
-        <View style={{flex:1,width:'100%'}}>
-            <SearchBar
-        round
-        onChangeText={this._onChangeText}
-        onClearText={this._onClearText}
-        placeholder='Type Here...' />
+        <View style={{flex:1,width:'100%',backgroundColor:'#5be524'}}>
+           <Text style={{fontSize:20,fontWeight:"900",paddingTop:15}} >Frequently Buy Products  </Text>
            
-            <ScrollView>  
+         
                         <FlatList
                                 data={this.state.checkboxes}
                                 renderItem={this._renderIteam}
@@ -399,11 +416,10 @@ _renderIteam=({item})=>{
                                
                                ListFooterComponent={()=>{if(this.state.loading) return <View style={{height:20}}><ActivityIndicator size="large" color="#0000ff" /></View>
                             else return <View></View>}}
-                               
+                            horizontal    
                                     
                         />   
-        </ScrollView>      
-        </View>
+      </View>
         )
     }
 }

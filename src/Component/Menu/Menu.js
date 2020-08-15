@@ -67,7 +67,7 @@ class GroceryScreen extends React.Component {
     static navigationOptions = {
       drawerLabel: 'Grocery',
       drawerIcon: ({ tintColor }) => (
-        <Icon name="home" size={20} color={tintColor} />
+        <Icon name="carrot" size={20} color={tintColor} />
       ),
     };
   
@@ -75,8 +75,7 @@ class GroceryScreen extends React.Component {
       return (
           <View style={{height:'100%'}}>
             <LogoTitle obj={this.props.navigation} />
-             <Grocery/>
-              
+             <Grocery/>    
           </View>
         
       );
@@ -166,6 +165,25 @@ class MyOrderScreen extends React.Component {
         <Icon name="mailbox" size={20} color={tintColor}/>
       ),
     };
+
+    componentDidMount(){
+      
+      this.isLoginData();
+    
+    }
+
+    isLoginData = async()=>{
+      let Token = await AsyncStorage.getItem('Token');
+      let UserID = await AsyncStorage.getItem('UserID');
+     
+  
+      console.log("Token : ",Token);
+      console.log("UserID : ",UserID);
+      if(Token == null && UserID == null ){
+         this.props.navigation.navigate('Login');
+      }
+     
+    }
   
     render() {
       return (
@@ -181,7 +199,7 @@ class MyCartScreen extends React.Component {
   static navigationOptions = {
     drawerLabel: 'My Cart',
     drawerIcon: ({ tintColor }) => (
-      <Icon name="home" size={20} color={tintColor} />
+      <Icon name="cart-outline" size={20} color={tintColor} />
     ),
   };
 
@@ -200,8 +218,39 @@ class MyCartScreen extends React.Component {
 
  /** My Login operation */
  class MyLoginScreen extends React.Component {
+  constructor(props){
+      super(props);
+      this.state={
+        isLogin:false
+      }
+  }
+  componentDidMount(){
+    this._DoneButton();
+  }
+
+   //done thish will place order
+   _DoneButton= async()=>{
+   
+  
+
+let Token = await AsyncStorage.getItem('Token');
+let UserID = await AsyncStorage.getItem('UserID');
+
+
+console.log("Token : ",Token);
+console.log("UserID : ",UserID);
+if(Token == null && UserID == null ){
+   this.setState({islogin:false});
+}
+else{
+    this.setState({islogin:true});
+}
+
+  
+}
+
   static navigationOptions = {
-    drawerLabel: 'Login',
+    drawerLabel: this.state.isLogin? 'LogOut':'Login',
     drawerIcon: ({ tintColor }) => (
       <Icon name="login" size={20} color={tintColor} />
     ),
@@ -224,7 +273,7 @@ class MyServiceScreen extends React.Component {
     static navigationOptions = {
       drawerLabel: 'Service',
       drawerIcon: ({ tintColor }) => (
-        <Icon name="toolbox" size={20} color={tintColor}/>
+        <Icon name="file-percent" size={20} color={tintColor}/>
       ),
     };
   
@@ -298,7 +347,8 @@ const CustomDrawerContentComponent = (props) => (
       screen:Test
     }
   },{
-    initialRouteName:'Test',
+    // initialRouteName:'Test',
+    initialRouteName:'Service',
     contentComponent:CustomDrawerContentComponent
   });
 
