@@ -6,7 +6,8 @@ import {
     AsyncStorage,
     NetInfo,
     Dimensions,
-    Modal
+    Modal,
+    ToastAndroid
 } from "react-native";
 import { 
     Container, 

@@ -77,7 +77,24 @@ export default class HireMeScreen extends Component {
                 );
                 return;
             }else{
-                console.log('yes internet '); 
+                console.log('yes internet ');
+                if(this.state.title.trim.length == 0){
+                    this.setState({
+                        title:'A work'
+                    })
+                } 
+                if(this.state.message.trim.length == 0 ){
+                    this.setState({
+                        message:'Call me now'
+                    })
+                }
+                if(this.state.WorkSubCatID == 0 ){
+                    this.setState({
+                        WorkSubCatID:this.state.workList[0].workSubCatId
+                    })
+                    
+                }
+                console.log("work id wor_subcat_id 0 :"+this.state.wor_subcat_id);
                 this.setState({
                     LodingModal:true,
                     submitButtonDisalbe:true,
@@ -106,6 +123,14 @@ export default class HireMeScreen extends Component {
                             });
                             ToastAndroid.showWithGravityAndOffset(
                                 'Successuly Sent',
+                                ToastAndroid.LONG,
+                                ToastAndroid.BOTTOM,
+                                25,
+                                50,
+                            );
+                        }else{
+                            ToastAndroid.showWithGravityAndOffset(
+                                'Internal Server Error',
                                 ToastAndroid.LONG,
                                 ToastAndroid.BOTTOM,
                                 25,

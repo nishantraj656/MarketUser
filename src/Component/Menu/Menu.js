@@ -343,7 +343,7 @@ const CustomDrawerContentComponent = (props) => (
       screen:MyLoginScreen,
     },
   },{
-    initialRouteName:'Home',
+    initialRouteName:'Service',
     contentComponent:CustomDrawerContentComponent
   });
 

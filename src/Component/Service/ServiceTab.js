@@ -222,7 +222,7 @@ export const ServiceTab = createBottomTabNavigator(
             
         animationEnabled: false,
         swipeEnabled: true,
-        initialRouteName :'History',
+        initialRouteName :'Home',
 
     },   
 );
